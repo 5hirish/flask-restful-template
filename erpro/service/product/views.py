@@ -122,6 +122,10 @@ def product_delete():
     Delete all existing products
     :return:
     """
+
+    db.session.query(ErpProductsModel).delete()
+    db.session.commit()
+
     return jsonify(
         {
             "status": "success",
