@@ -188,7 +188,7 @@ def product_fetch():
         else:
             page_products = ErpProductsModel.query.paginate(page_num, per_page=page_limit, error_out=False)
 
-        if page_products is not None and page_products.items is not None:
+        if page_products is not None and page_products.items is not None and len(page_products.items) > 0:
             list_products = []
             for cur_product in page_products.items:
                 product = {
