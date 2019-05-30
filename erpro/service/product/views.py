@@ -125,8 +125,9 @@ def product_search():
 
     return jsonify(
         {
-            "status": "success",
-            "msg": "Fetched products",
+            "status": "failure",
+            "msg": "Missing query parameters",
+            "errorCode": "INVALID_PAYLOAD"
         }
     ), 200
 
@@ -134,7 +135,8 @@ def product_search():
 @product_blueprint.route('/all', methods=["GET"])
 def product_fetch():
     """
-    View all of the products
+    View all of the products.
+    Default page 1 and limit 100
     :return: Pagination
     """
     page_limit, page_num = 100, 1
