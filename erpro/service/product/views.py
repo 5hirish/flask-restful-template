@@ -1,7 +1,6 @@
 import os
 import time
 import pathlib
-import csv
 
 from datetime import datetime, date
 from flask import Blueprint, Response, request, jsonify, session, send_file, current_app, g
@@ -64,27 +63,7 @@ def product_import(file_type):
                     break
                 data_file.write(chunk)
 
-        # import_products.delay(raw_text)
-        with open(data_file_path, "r") as csv_file:
-            product_reader = csv.DictReader(csv_file)
-            for row in product_reader:
-                if "name" and "sku" in row:
-                    erp_product = ErpProductsModel(
-                        productSKU=row.get("sku"),
-                        productName=row.get("name"),
-                        productDescription=row.get("description")
-                    )
-
-                    existing_product = ErpProductsModel.query.filter_by(productSKU=row.get("sku")).one_or_none()
-                    if existing_product is not None:
-                        db.session.merge(erp_product)
-                        db.session.flush()
-                    else:
-                        db.session.add(erp_product)
-
-                    current_app.logger.info("Committing data to database")
-
-                    db.session.commit()
+        import_products.delay(data_file_path)
 
         return jsonify(
             {
@@ -96,7 +75,7 @@ def product_import(file_type):
     return jsonify(
         {
             "status": "failure",
-            "msg": "Products scheduled for import",
+            "msg": "Products importing failed",
         }
     ), 200
 
@@ -109,6 +88,41 @@ def product_search():
     Filter Products.
     :return: The matching products
     """
+
+    product_sku = request.args.get("sku")
+    product_status = request.args.get("status")
+
+    if product_sku is not None and product_sku != "":
+        if product_status is not None and product_status != "":
+            search_product = ErpProductsModel.query.filter_by(productSKU=product_sku, productStatus=product_status).one_or_none()
+        else:
+            search_product = ErpProductsModel.query.filter_by(productSKU=product_sku).one_or_none()
+
+        if search_product is not None:
+            product = {
+                "name": search_product.productName,
+                "description": search_product.productDescription,
+                "status": search_product.productStatus,
+                "modifiedOn": search_product.productModifiedOn
+            }
+
+            return jsonify({
+                "status": "success",
+                "msg": "Fetched {0} product".format(product_sku),
+                "data": product
+            }), 200
+
+        else:
+            if product_status is not None:
+                msg = "No such {0} product found with status {1}".format(product_sku, product_status)
+            else:
+                msg = "No such {0} product found".format(product_sku)
+            return jsonify({
+                "status": "failure",
+                "msg": msg,
+                "errorCode": "NOT_FOUND"
+            }), 200
+
     return jsonify(
         {
             "status": "success",
