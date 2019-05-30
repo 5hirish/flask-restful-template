@@ -9,6 +9,13 @@ python:
 os:
   - linux
 
+env:
+  global:
+  - PYTHONUNBUFFERED=yes
+  - DATABASE_URL=postgresql://postgres:@localhost@5432/erpro_test
+  - CLOUDAMQP_URL=amqp://guest:guest@localhost:5672/
+  - SECRET_KEY=travis_ci
+
 #virtualenv:
 #  system_site_packages: true
 
@@ -22,8 +29,17 @@ branches:
 install:
   - pip install -r requirements.txt
 
+before_script:
+  - psql -c 'create database erpro_test;' -U postgres
+  - export FLASK_APP="$TRAVIS_BUILD_DIR/erpro/service/core.py"
+  - flask db upgrade
+
 script:
   - pytest --cov=codecov
+
+services:
+  - postgresql
+  - rabbitmq
 
 after_success:
   - codecov
