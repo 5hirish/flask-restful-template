@@ -89,38 +89,58 @@ def product_search():
     """
 
     product_sku = request.args.get("sku")
+    product_name = request.args.get("name")
     product_status = request.args.get("status")
 
-    if product_sku is not None and product_sku != "":
-        if product_status is not None and product_status != "":
-            search_product = ErpProductsModel.query.filter_by(productSKU=product_sku, productStatus=product_status)\
-                .one_or_none()
-        else:
-            search_product = ErpProductsModel.query.filter_by(productSKU=product_sku).one_or_none()
+    if (product_sku is not None and product_sku != "") \
+            or (product_name is not None and product_name != ""):
+        product_results = []
 
-        if search_product is not None:
-            product = {
-                "name": search_product.productName,
-                "sku": search_product.productSKU,
-                "description": search_product.productDescription,
-                "status": search_product.productStatus,
-                "modifiedOn": search_product.productModifiedOn
-            }
+        if product_sku is not None and product_sku != "":
+            if product_status is not None and product_status != "":
+                product_res = ErpProductsModel.query.filter_by(productSKU=product_sku, productStatus=product_status)\
+                    .one_or_none()
+            else:
+                product_res = ErpProductsModel.query.filter_by(productSKU=product_sku).one_or_none()
+            if product_res is not None:
+                product_results = [product_res]
+
+        elif product_name is not None and product_name != "":
+            if product_status is not None and product_status != "":
+                product_results = ErpProductsModel.query.filter(and_(
+                    ErpProductsModel.productName.ilike('%' + product_name + '%'),
+                    ErpProductsModel.productStatus == product_status
+                )).all()
+
+            else:
+                product_results = ErpProductsModel.query.filter(
+                    ErpProductsModel.productName.ilike('%' + product_name + '%')).all()
+        else:
+            product_results = None
+
+        if product_results is not None and len(product_results) > 0:
+            product_list = []
+            for product in product_results:
+                if product is not None:
+                    product = {
+                        "name": product.productName,
+                        "sku": product.productSKU,
+                        "description": product.productDescription,
+                        "status": product.productStatus,
+                        "modifiedOn": product.productModifiedOn
+                    }
+                    product_list.append(product)
 
             return jsonify({
                 "status": "success",
                 "msg": "Fetched {0} product".format(product_sku),
-                "data": product
+                "data": product_list
             }), 200
 
         else:
-            if product_status is not None:
-                msg = "No such {0} product found with status {1}".format(product_sku, product_status)
-            else:
-                msg = "No such {0} product found".format(product_sku)
             return jsonify({
                 "status": "failure",
-                "msg": msg,
+                "msg": "No products found for the criteria",
                 "errorCode": "NOT_FOUND"
             }), 200
 
