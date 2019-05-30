@@ -95,11 +95,11 @@ def register_logger(app):
 
     gunicorn_logger = logging.getLogger('gunicorn.error')
 
-    log_dir = "log/erpro/"
+    log_dir = "/var/log/erpro"
     # create file handler which logs even debug messages
     os.makedirs(os.path.dirname(log_dir), exist_ok=True)
 
-    fh = logging.FileHandler(log_dir+'erpro.log')
+    fh = logging.FileHandler(os.path.join(log_dir, 'erpro.log'))
 
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level

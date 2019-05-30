@@ -1,8 +1,5 @@
 import os
-import io
 import pytest
-
-from flask import current_app
 
 
 def test_product_import(test_client):
@@ -65,9 +62,4 @@ def test_product_fetch(test_client, input_params, expected_res):
     else:
         assert json_data.get("errorCode") == expected_res.get("errorCode")
 
-# def test_product_delete(test_client):
-#
-#     response = test_client.delete('/product/')
-#     json_data = response.json
-#     assert response.status_code == 200
-#     assert json_data.get("status") == "success"
+
