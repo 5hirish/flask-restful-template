@@ -1,6 +1,6 @@
 import os
 import time
-import pathlib
+import io
 
 from datetime import datetime, date
 from flask import Blueprint, Response, request, jsonify, session, send_file, current_app, g
@@ -37,33 +37,22 @@ def product_import(file_type):
     allowed_file_extensions = set(['csv'])
 
     if file_type is not None and not request.stream.is_exhausted and file_type.lower() in allowed_file_extensions:
-        static_file_path = current_app.config.get("STATIC_FILE_PATH")
-
-        current_time_milli = str(round(time.time() * 1000))
-
-        data_file_name = current_time_milli + "." + file_type.lower()
-        data_file_path = os.path.join(static_file_path, data_file_name)
 
         total_streamed = 0
 
-        if not os.path.exists(static_file_path):
-            data_path = pathlib.Path(static_file_path)
-            data_path.parent.mkdir(parents=True, exist_ok=True)
-            if not os.path.exists(static_file_path):
-                os.mkdir(static_file_path)
+        chunk_size = 4096
+        chunk_str = ""
 
-        with open(data_file_path, "bw") as data_file:
-            chunk_size = 4096
-            current_app.logger.debug("Stream Size:{0}".format(request.stream.limit))
-            while not request.stream.is_exhausted:
-                chunk = request.stream.read(chunk_size)
-                total_streamed += chunk_size
-                if len(chunk) == 0:
-                    current_app.logger.debug("File saved at location:{0}".format(data_file_name))
-                    break
-                data_file.write(chunk)
+        current_app.logger.debug("Stream Size:{0}".format(request.stream.limit))
+        while not request.stream.is_exhausted:
+            chunk = request.stream.read(chunk_size)
+            total_streamed += chunk_size
+            if len(chunk) == 0:
+                current_app.logger.debug("File saved at location:{0}".format(data_file_name))
+                break
+            chunk_str += str(chunk, "utf-8")
 
-        import_products.delay(data_file_path)
+        import_products.delay(chunk_str)
 
         return jsonify(
             {
@@ -75,6 +64,7 @@ def product_import(file_type):
     return jsonify(
         {
             "status": "failure",
+            "errorCode": "INVALID_PAYLOAD",
             "msg": "Products importing failed",
         }
     ), 200
