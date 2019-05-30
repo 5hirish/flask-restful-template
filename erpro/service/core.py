@@ -4,12 +4,13 @@ import os
 from flask import Flask, jsonify
 from datetime import datetime
 
+from erpro.config import ProdConfig
 from erpro.service.extensions import migrate, db
 
 app_name = 'erpro'
 
 
-def create_app(config_object=None, enable_blueprints=True):
+def create_app(config_object=ProdConfig, enable_blueprints=True):
 
     app = Flask(__name__)
 
