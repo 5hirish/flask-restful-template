@@ -9,11 +9,11 @@ Relationship = db.relationship
 Model = db.Model
 
 
-class EmployeeLeaveModel(Model):
+class ErpProductsModel(Model):
     __tablename__ = 'erp_products'
 
     productSKU = Column(VARCHAR(255), primary_key=True, unique=True, nullable=False)
-    productName = Column(VARCHAR(255), nullable=False, unique=True)
+    productName = Column(VARCHAR(255), nullable=False)
     productDescription = Column(TEXT, nullable=True)
     productStatus = Column(VARCHAR(15), default="inactive", nullable=False)
-    productModifiedOn = Column(DATE, nullable=True)
+    productModifiedOn = Column(DATE, default=datetime.utcnow, nullable=False)

@@ -11,7 +11,7 @@ from sqlalchemy.sql.expression import and_, or_
 
 from erpro.service.extensions import db
 from erpro.worker.tasks import import_products
-from erpro.service.product.models import EmployeeLeaveModel
+from erpro.service.product.models import ErpProductsModel
 
 blue_print_name = 'product'
 blue_print_prefix = '/product'
@@ -55,12 +55,12 @@ def product_import(file_type):
 
         with open(data_file_path, "bw") as data_file:
             chunk_size = 4096
-            # logger.debug("Stream Size:{0}".format(request.stream.limit))
+            current_app.logger.debug("Stream Size:{0}".format(request.stream.limit))
             while not request.stream.is_exhausted:
                 chunk = request.stream.read(chunk_size)
                 total_streamed += chunk_size
                 if len(chunk) == 0:
-                    # logger.debug("File saved at location:{0}".format(data_file_name))
+                    current_app.logger.debug("File saved at location:{0}".format(data_file_name))
                     break
                 data_file.write(chunk)
 
@@ -69,9 +69,21 @@ def product_import(file_type):
             product_reader = csv.DictReader(csv_file)
             for row in product_reader:
                 if "name" and "sku" in row:
-                    print(row.get("sku"), row.get("name"))
+                    erp_product = ErpProductsModel(
+                        productSKU=row.get("sku"),
+                        productName=row.get("name"),
+                        productDescription=row.get("description")
+                    )
 
+                    existing_product = ErpProductsModel.query.filter_by(productSKU=row.get("sku")).one_or_none()
+                    if existing_product is not None:
+                        existing_product = erp_product
+                    else:
+                        db.session.add(erp_product)
 
+                    current_app.logger.info("Committing data to database")
+
+                    db.session.commit()
 
         return jsonify(
             {
