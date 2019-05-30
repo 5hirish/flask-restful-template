@@ -93,7 +93,8 @@ def product_search():
 
     if product_sku is not None and product_sku != "":
         if product_status is not None and product_status != "":
-            search_product = ErpProductsModel.query.filter_by(productSKU=product_sku, productStatus=product_status).one_or_none()
+            search_product = ErpProductsModel.query.filter_by(productSKU=product_sku, productStatus=product_status)\
+                .one_or_none()
         else:
             search_product = ErpProductsModel.query.filter_by(productSKU=product_sku).one_or_none()
 
@@ -129,14 +130,73 @@ def product_search():
         }
     ), 200
 
+
 @product_blueprint.route('/all', methods=["GET"])
 def product_fetch():
     """
     View all of the products
     :return: Pagination
     """
-    product_sku = request.args.get("sku")
+    page_limit, page_num = 100, 1
+
+    page_limit_str = request.args.get("limit", 100)
+    page_num_str = request.args.get("page", 1)
     product_status = request.args.get("status")
+
+    if page_limit_str is not None and page_limit_str != "":
+        try:
+            page_limit = int(page_limit_str)
+        except ValueError:
+            page_limit = 100
+
+    if page_num_str is not None and page_num_str != "":
+        try:
+            page_num = int(page_num_str)
+        except ValueError:
+            page_num = 100
+
+    if 0 < page_limit <= 1000 and 0 < page_num:
+
+        total_products = ErpProductsModel.query.count()
+
+        if product_status is not None and product_status != "":
+            page_products = ErpProductsModel.query.filter_by(productStatus=product_status)\
+                .paginate(page_num, per_page=page_limit, error_out=False)
+        else:
+            page_products = ErpProductsModel.query.paginate(page_num, per_page=page_limit, error_out=False)
+
+        if page_products is not None and page_products.items is not None:
+            list_products = []
+            for cur_product in page_products.items:
+                product = {
+                    "name": cur_product.productName,
+                    "description": cur_product.productDescription,
+                    "status": cur_product.productStatus,
+                    "modifiedOn": cur_product.productModifiedOn
+                }
+
+                list_products.append(product)
+
+            return jsonify({
+                "status": "success",
+                "msg": "Fetched products {0}".format(len(list_products)),
+                "totalProducts": total_products,
+                "data": list_products
+            }), 200
+
+        return jsonify({
+            "status": "failure",
+            "msg": "Products fetch out of bounds",
+            "errorCode": "NOT_FOUND"
+        }), 200
+
+    return jsonify(
+        {
+            "status": "failure",
+            "msg": "Invalid page parameters",
+            "errorCode": "INVALID_PAYLOAD"
+        }
+    ), 200
 
 
 @product_blueprint.route('/', methods=["DELETE"])
