@@ -83,7 +83,6 @@ def product_import(file_type):
 @product_blueprint.route('/', methods=["GET"])
 def product_search():
     """
-    View all of the products,
     Search Products.
     Filter Products.
     :return: The matching products
@@ -129,6 +128,15 @@ def product_search():
             "msg": "Fetched products",
         }
     ), 200
+
+@product_blueprint.route('/all', methods=["GET"])
+def product_fetch():
+    """
+    View all of the products
+    :return: Pagination
+    """
+    product_sku = request.args.get("sku")
+    product_status = request.args.get("status")
 
 
 @product_blueprint.route('/', methods=["DELETE"])
