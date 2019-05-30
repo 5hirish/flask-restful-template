@@ -95,7 +95,7 @@ def register_logger(app):
 
     gunicorn_logger = logging.getLogger('gunicorn.error')
 
-    log_dir = "/var/log/erpro"
+    log_dir = "logs/"
     # create file handler which logs even debug messages
     os.makedirs(os.path.dirname(log_dir), exist_ok=True)
 
