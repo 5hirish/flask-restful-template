@@ -41,8 +41,10 @@ def register_extensions(app):
 def register_blueprints(app):
 
     # defer the import until it is really needed
+    from erpro.service.product.views import product_blueprint
 
     """Register Flask blueprints."""
+    app.register_blueprint(product_blueprint)
 
     return None
 
