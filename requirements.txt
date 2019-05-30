@@ -1,0 +1,13 @@
+requests
+sqlalchemy
+celery
+pytest
+gunicorn
+psycopg2
+
+flask
+werkzeug[watchdog]
+flask_sqlalchemy
+flask_migrate
+
+python-dotenv
