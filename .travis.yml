@@ -12,8 +12,8 @@ os:
 env:
   global:
   - PYTHONUNBUFFERED=yes
-  - DATABASE_URL=postgresql://postgres:@localhost@5432/erpro_test
-  - CLOUDAMQP_URL=amqp://guest:guest@localhost:5672/
+  - DATABASE_URL=postgresql://postgres:@127.0.0.1@5432/erpro_test
+  - CLOUDAMQP_URL=amqp://guest:guest@127.0.0.1:5672/
   - SECRET_KEY=travis_ci
 
 #virtualenv:
