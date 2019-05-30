@@ -1,17 +1,15 @@
-import os
 import pytest
 
 
 def test_product_import(test_client):
-    current_test_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    current_test_path = os.path.join(current_test_path, 'static')
-    test_csv_file = os.path.join(current_test_path, 'test_products.csv')
+
+    test_csv_file = 'test_products.csv'
+
     with open(test_csv_file, 'r') as csv_file:
 
         response = test_client.post('/product/csv/import', data=csv_file)
 
         json_data = response.json
-        print(json_data)
         assert response.status_code == 200
         assert json_data.get("status") == "success"
 
@@ -53,7 +51,6 @@ def test_product_search(test_client, input_params, expected_res):
 def test_product_fetch(test_client, input_params, expected_res):
     response = test_client.get('/product/all', query_string=input_params)
     json_data = response.json
-    print(json_data)
     assert response.status_code == 200
     assert json_data.get("status") == expected_res.get("status")
     if json_data.get("status") == "success":
