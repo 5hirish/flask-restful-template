@@ -4,6 +4,7 @@ celery
 pytest
 gunicorn
 psycopg2
+pandas
 
 flask
 werkzeug[watchdog]
