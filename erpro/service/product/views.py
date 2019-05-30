@@ -101,6 +101,7 @@ def product_search():
         if search_product is not None:
             product = {
                 "name": search_product.productName,
+                "sku": search_product.productSKU,
                 "description": search_product.productDescription,
                 "status": search_product.productStatus,
                 "modifiedOn": search_product.productModifiedOn
