@@ -84,7 +84,9 @@ def register_route(app):
             {
                 "name": "ERPRO",
                 "time": datetime.utcnow(),
-                "developer": "5hirish"
+                "developer": "5hirish",
+                "website": "www.5hirish.com",
+                "blog": "www.shirishkadam.com"
             }
         )
 
