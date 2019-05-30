@@ -12,6 +12,7 @@ os:
 env:
   global:
   - PYTHONUNBUFFERED=yes
+  - SQLALCHEMY_DATABASE_URI=postgresql://postgres:@127.0.0.1@5432/erpro_test
   - DATABASE_URL=postgresql://postgres:@127.0.0.1@5432/erpro_test
   - CLOUDAMQP_URL=amqp://guest:guest@127.0.0.1:5672/
   - SECRET_KEY=travis_ci
