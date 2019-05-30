@@ -1,13 +1,6 @@
-import requests
-import json
 import csv
-
+import os
 from datetime import datetime
-
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from celery import group, chain, states
 from celery.utils.log import get_task_logger
 
 from erpro.service.extensions import db
@@ -30,7 +23,8 @@ def import_products(data_file_path):
                 erp_product = ErpProductsModel(
                     productSKU=row.get("sku"),
                     productName=row.get("name"),
-                    productDescription=row.get("description")
+                    productDescription=row.get("description"),
+                    productModifiedOn=datetime.utcnow()
                 )
 
                 existing_product = ErpProductsModel.query.filter_by(productSKU=row.get("sku")).one_or_none()
@@ -43,3 +37,7 @@ def import_products(data_file_path):
                 logger.info("Committing data to database")
 
                 db.session.commit()
+
+    if os.path.exists(data_file_path):
+        logger.info("Removed uploaded file")
+        os.remove(data_file_path)
