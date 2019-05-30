@@ -12,9 +12,8 @@ Model = db.Model
 class EmployeeLeaveModel(Model):
     __tablename__ = 'erp_products'
 
-    pid = Column(INTEGER, primary_key=True, unique=True, nullable=False)
-    productName = Column(VARCHAR(255), nullable=False)
-    productSKU = Column(VARCHAR(255), nullable=False)
-    productDescription = Column(TEXT, nullable=False)
-    productStatus = Column(VARCHAR(15), nullable=False)
+    productSKU = Column(VARCHAR(255), primary_key=True, unique=True, nullable=False)
+    productName = Column(VARCHAR(255), nullable=False, unique=True)
+    productDescription = Column(TEXT, nullable=True)
+    productStatus = Column(VARCHAR(15), default="inactive", nullable=False)
     productModifiedOn = Column(DATE, nullable=True)

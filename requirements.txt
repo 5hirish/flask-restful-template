@@ -7,6 +7,7 @@ psycopg2
 pandas
 
 flask
+watchdog
 werkzeug[watchdog]
 flask_sqlalchemy
 flask_migrate

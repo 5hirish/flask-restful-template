@@ -11,6 +11,8 @@ class Config:
     else:
         app_debug = False
 
+    STATIC_FILE_PATH = os.path.join(os.getcwd(), 'static')
+
     SECRET_KEY = os.getenv("SECRET_KEY")
     SESSION_COOKIE_NAME = 'erpro_app'
 
