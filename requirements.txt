@@ -15,5 +15,5 @@ flask_migrate
 python-dotenv
 
 pytest
-pytest-cov
+pytest-cov==2.5.0
 codecov
