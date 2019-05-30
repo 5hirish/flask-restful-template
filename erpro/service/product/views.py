@@ -77,7 +77,8 @@ def product_import(file_type):
 
                     existing_product = ErpProductsModel.query.filter_by(productSKU=row.get("sku")).one_or_none()
                     if existing_product is not None:
-                        existing_product = erp_product
+                        db.session.merge(erp_product)
+                        db.session.flush()
                     else:
                         db.session.add(erp_product)
 
