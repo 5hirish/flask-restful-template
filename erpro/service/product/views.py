@@ -75,6 +75,7 @@ def product_import(file_type):
     return jsonify(
         {
             "status": "failure",
+            "errorCode": "INVALID_PAYLOAD",
             "msg": "Products importing failed",
         }
     ), 200
