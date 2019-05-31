@@ -48,18 +48,19 @@ def product_import(file_type):
             chunk = request.stream.read(chunk_size)
             total_streamed += chunk_size
             if len(chunk) == 0:
-                current_app.logger.debug("File saved at location:{0}".format(data_file_name))
                 break
             chunk_str += str(chunk, "utf-8")
 
-        import_products.delay(chunk_str)
+        if chunk_str != "":
 
-        return jsonify(
-            {
-                "status": "success",
-                "msg": "Products scheduled for import",
-            }
-        ), 200
+            import_products.delay(chunk_str)
+
+            return jsonify(
+                {
+                    "status": "success",
+                    "msg": "Products scheduled for import",
+                }
+            ), 200
 
     return jsonify(
         {
