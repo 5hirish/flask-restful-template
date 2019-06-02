@@ -1,4 +1,5 @@
 ## ERPRO App
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a421115894ff4bca92b18ae94b6ced69)](https://app.codacy.com/app/5hirish/erpro?utm_source=github.com&utm_medium=referral&utm_content=5hirish/erpro&utm_campaign=Badge_Grade_Dashboard)
 [![Python](https://img.shields.io/badge/python-3.4_3.5_3.6-blue.svg)]()
 [![Coverage](https://img.shields.io/badge/coverage-84-green.svg)]()
 
