@@ -1,4 +1,3 @@
-import os
 from erpro.worker.core import celery_task
 
 if __name__ == '__main__':

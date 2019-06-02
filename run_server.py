@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     # Werkzeug, WSGI utility library for Python, enable module reloader
     erpro_app.run(use_reloader=True,
-                  host="0.0.0.0",
+                  host=os.environ.get("HOST_IP"),
                   reloader_interval=0,
                   use_debugger=app_debug,
                   reloader_type='watchdog')

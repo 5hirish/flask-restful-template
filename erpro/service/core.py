@@ -74,10 +74,6 @@ def register_route(app):
     #     # will not attempt to recreate tables already present in the target database.
     #     db.create_all()
 
-    @app.before_first_request
-    def first_request_tasks():
-        pass
-
     @app.route('/', methods=['GET'])
     def init_api():
         return jsonify(

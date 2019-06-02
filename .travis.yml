@@ -12,8 +12,8 @@ os:
 env:
   global:
   - PYTHONUNBUFFERED=yes
-  - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@127.0.0.1@5432/erpro_test
-  - DATABASE_URL=postgresql://postgres:postgres@127.0.0.1@5432/erpro_test
+  - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@localhost:5432/erpro_test
+  - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/erpro_test
   - CLOUDAMQP_URL=amqp://guest:guest@127.0.0.1:5672/
   - SECRET_KEY=travis_ci
 
@@ -31,8 +31,8 @@ install:
   - pip install -r requirements.txt
 
 before_script:
+  - psql -c "create database erpro_test;" -U postgres
   - psql -c "alter user postgres with password 'postgres';"
-  - psql -c 'create database erpro_test;' -U postgres
   - export FLASK_APP="$TRAVIS_BUILD_DIR/erpro/service/core.py"
   - flask db upgrade
 

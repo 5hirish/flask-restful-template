@@ -1,7 +1,9 @@
-from erpro.service.extensions import db
-from sqlalchemy.dialects.postgresql import UUID, VARCHAR, TIMESTAMP, DATE, TEXT, ARRAY, BOOLEAN, INTEGER
-from sqlalchemy import ForeignKey, String, Integer, text
 from datetime import datetime
+
+from sqlalchemy.dialects.postgresql import VARCHAR, DATE, TEXT
+# from sqlalchemy.types import VARCHAR, DATE, TEXT  # Generic types
+
+from erpro.service.extensions import db
 
 # Alias common SQLAlchemy names
 Column = db.Column

@@ -1,6 +1,3 @@
-import pytest
-
-
 def test_root(test_client):
     """
     GIVEN a Flask application

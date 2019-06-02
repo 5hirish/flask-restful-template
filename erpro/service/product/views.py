@@ -1,16 +1,9 @@
-import os
-import time
-import io
-
-from datetime import datetime, date
-from flask import Blueprint, Response, request, jsonify, session, send_file, current_app, g
-
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.expression import and_, or_
+from flask import Blueprint, request, jsonify, current_app
+from sqlalchemy.sql.expression import and_
 
 from erpro.service.extensions import db
-from erpro.worker.tasks import import_products
 from erpro.service.product.models import ErpProductsModel
+from erpro.worker.tasks import import_products
 
 blue_print_name = 'product'
 blue_print_prefix = '/product'
@@ -209,6 +202,24 @@ def product_fetch():
             "status": "failure",
             "msg": "Invalid page parameters",
             "errorCode": "INVALID_PAYLOAD"
+        }
+    ), 200
+
+
+@product_blueprint.route('/{string:sku}/{string:status}', methods=["POST"])
+def product_mark():
+    """
+    Mark product active/inactvie products
+    :return:
+    """
+
+    db.session.query(ErpProductsModel).delete()
+    db.session.commit()
+
+    return jsonify(
+        {
+            "status": "success",
+            "msg": "Deleted all products",
         }
     ), 200
 
