@@ -22,6 +22,10 @@ class Config:
 
     FILE_STREAM_LIMIT = 53687091200     # 50 Gigabytes
 
+    AWS_S3_PRODUCT_BUCKET = os.getenv("AWS_S3_PRODUCT_BUCKET")
+    AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
 
 class ProdConfig(Config):
     """Production configuration."""

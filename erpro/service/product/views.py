@@ -1,9 +1,14 @@
+import boto3
+import time
+
 from flask import Blueprint, request, jsonify, current_app
 from sqlalchemy.sql.expression import and_
+from botocore.exceptions import NoCredentialsError, ClientError
 
 from erpro.service.extensions import db
 from erpro.service.product.models import ErpProductsModel
 from erpro.worker.tasks import import_products
+from erpro.utils import get_aws_client
 
 blue_print_name = 'product'
 blue_print_prefix = '/product'
@@ -31,30 +36,46 @@ def product_import(file_type):
 
     if file_type is not None and not request.stream.is_exhausted and file_type.lower() in allowed_file_extensions:
 
-        total_streamed = 0
+        s3_client = get_aws_client('s3',
+                                   current_app.config.get("AWS_ACCESS_KEY"),
+                                   current_app.config.get("AWS_SECRET_ACCESS_KEY"))
 
-        chunk_size = 4096
-        chunk_str = ""
+        s3_bucket_name = current_app.config.get("AWS_S3_PRODUCT_BUCKET")
 
         current_app.logger.debug("Stream Size:{0}".format(request.stream.limit))
 
-        if request.stream.limit <= current_app.config.get("FILE_STREAM_LIMIT"):
-            while not request.stream.is_exhausted:
-                chunk = request.stream.read(chunk_size)
-                total_streamed += chunk_size
-                if len(chunk) == 0:
-                    break
-                chunk_str += str(chunk, "utf-8")
+        is_bucket_present = False
+        try:
+            bucket_head = s3_client.head_bucket(Bucket=s3_bucket_name)
+            if bucket_head.get("ResponseMetadata") is not None:
+                is_bucket_present = bucket_head.get("ResponseMetadata").get("HTTPStatusCode") == 200
+        except NoCredentialsError as err:
+            current_app.logger.exception(err)
+        except ClientError as err:
+            current_app.logger.exception(err)
 
-            if chunk_str != "":
-                import_products.delay(chunk_str)
+        if request.stream.limit <= current_app.config.get("FILE_STREAM_LIMIT") and is_bucket_present:
 
-                return jsonify(
-                    {
-                        "status": "success",
-                        "msg": "Products scheduled for import",
-                    }
-                ), 200
+            current_time_milli = str(round(time.time() * 1000))
+            file_name = current_time_milli + "." + file_type
+
+            s3_client.upload_fileobj(request.stream, s3_bucket_name, file_name)
+
+            # if chunk_str != "":
+            #     import_products.delay(chunk_str)
+
+            return jsonify(
+                {
+                    "status": "success",
+                    "msg": "Products scheduled for import",
+                }
+            ), 200
+        elif not is_bucket_present:
+            return jsonify({
+                    "status": "failure",
+                    "errorCode": "BUCKET_FAILED",
+                    "msg": "Failed to connect to Storage bucket",
+                }), 200
         else:
             return jsonify(
                 {
