@@ -1,7 +1,9 @@
 ## ERPRO App
 [![Python](https://img.shields.io/badge/python-3.4_3.5_3.6-blue.svg)]()
-[![Coverage](https://img.shields.io/badge/coverage-84-green.svg)]()
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a700a69ec99c46d4a5bef0eb6f774d78)](https://www.codacy.com/app/5hirish/erpro?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=5hirish/erpro&amp;utm_campaign=Badge_Grade)
+[![codecov](https://codecov.io/gh/5hirish/erpro/branch/master/graph/badge.svg)](https://codecov.io/gh/5hirish/erpro)
+[![codacy](https://api.codacy.com/project/badge/Grade/a700a69ec99c46d4a5bef0eb6f774d78)](https://www.codacy.com/app/5hirish/erpro?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=5hirish/erpro&amp;utm_campaign=Badge_Grade)
+[![travis](https://travis-ci.org/5hirish/erpro.svg?branch=master)](https://travis-ci.org/5hirish/adam_qas)
+
 
 ### Initial server set-up
 1.  `git clone https://github.com/5hirish/erpro`
