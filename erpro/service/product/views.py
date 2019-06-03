@@ -61,8 +61,12 @@ def product_import(file_type):
 
             s3_client.upload_fileobj(request.stream, s3_bucket_name, file_name)
 
-            # if chunk_str != "":
-            #     import_products.delay(chunk_str)
+            if current_app.config.get("CELERY_TASK_ALWAYS_EAGER"):
+                import_products.s(file_name).apply()
+                current_app.logger.info("Task executed synchronously")
+            else:
+                current_app.logger.info("Task sent to celery worker")
+                import_products.delay(file_name)
 
             return jsonify(
                 {
@@ -70,6 +74,7 @@ def product_import(file_type):
                     "msg": "Products scheduled for import",
                 }
             ), 200
+
         elif not is_bucket_present:
             return jsonify({
                     "status": "failure",
