@@ -20,6 +20,12 @@ class Config:
     CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
     BROKER_POOL_LIMIT = 1
 
+    FILE_STREAM_LIMIT = 53687091200     # 50 Gigabytes
+
+    AWS_S3_PRODUCT_BUCKET = os.getenv("AWS_S3_PRODUCT_BUCKET")
+    AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
 
 class ProdConfig(Config):
     """Production configuration."""
@@ -40,6 +46,8 @@ class DevConfig(Config):
 
     SENTRY_DSN = ""
 
+    CELERY_TASK_ALWAYS_EAGER = True
+
 
 class TestConfig(Config):
     """Test configuration."""
@@ -47,6 +55,8 @@ class TestConfig(Config):
     ENV = 'test'
     TESTING = True
     DEBUG = True
+
+    CELERY_TASK_ALWAYS_EAGER = True
 
 
 
