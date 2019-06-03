@@ -17,6 +17,12 @@ logger = get_task_logger(__name__)
                   bind=False, max_retries=3, default_retry_delay=300, track_started=True,
                   base=BaseTask)
 def import_products(file_name):
+    """
+    Celery task to stream file from bucket and iterate over to upsert data into database.
+    :param file_name: S3 file name or Key
+    :return: None
+    """
+
     file_stream = None
 
     s3_client = get_aws_client('s3',
