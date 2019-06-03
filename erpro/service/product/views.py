@@ -37,21 +37,30 @@ def product_import(file_type):
         chunk_str = ""
 
         current_app.logger.debug("Stream Size:{0}".format(request.stream.limit))
-        while not request.stream.is_exhausted:
-            chunk = request.stream.read(chunk_size)
-            total_streamed += chunk_size
-            if len(chunk) == 0:
-                break
-            chunk_str += str(chunk, "utf-8")
 
-        if chunk_str != "":
+        if request.stream.limit <= current_app.config.get("FILE_STREAM_LIMIT"):
+            while not request.stream.is_exhausted:
+                chunk = request.stream.read(chunk_size)
+                total_streamed += chunk_size
+                if len(chunk) == 0:
+                    break
+                chunk_str += str(chunk, "utf-8")
 
-            import_products.delay(chunk_str)
+            if chunk_str != "":
+                import_products.delay(chunk_str)
 
+                return jsonify(
+                    {
+                        "status": "success",
+                        "msg": "Products scheduled for import",
+                    }
+                ), 200
+        else:
             return jsonify(
                 {
-                    "status": "success",
-                    "msg": "Products scheduled for import",
+                    "status": "failure",
+                    "errorCode": "STREAM_LIMIT_EXCEEDED",
+                    "msg": "Products upload is limited to 50GB",
                 }
             ), 200
 
@@ -82,7 +91,7 @@ def product_search():
 
         if product_sku is not None and product_sku != "":
             if product_status is not None and product_status != "":
-                product_res = ErpProductsModel.query.filter_by(productSKU=product_sku, productStatus=product_status)\
+                product_res = ErpProductsModel.query.filter_by(productSKU=product_sku, productStatus=product_status) \
                     .one_or_none()
             else:
                 product_res = ErpProductsModel.query.filter_by(productSKU=product_sku).one_or_none()
@@ -167,7 +176,7 @@ def product_fetch():
         total_products = ErpProductsModel.query.count()
 
         if product_status is not None and product_status != "":
-            page_products = ErpProductsModel.query.filter_by(productStatus=product_status)\
+            page_products = ErpProductsModel.query.filter_by(productStatus=product_status) \
                 .paginate(page_num, per_page=page_limit, error_out=False)
         else:
             page_products = ErpProductsModel.query.paginate(page_num, per_page=page_limit, error_out=False)

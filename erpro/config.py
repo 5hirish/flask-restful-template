@@ -20,6 +20,8 @@ class Config:
     CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
     BROKER_POOL_LIMIT = 1
 
+    FILE_STREAM_LIMIT = 53687091200     # 50 Gigabytes
+
 
 class ProdConfig(Config):
     """Production configuration."""
@@ -47,6 +49,8 @@ class TestConfig(Config):
     ENV = 'test'
     TESTING = True
     DEBUG = True
+
+    CELERY_TASK_ALWAYS_EAGER = True
 
 
 

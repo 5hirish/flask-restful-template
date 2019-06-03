@@ -3,7 +3,7 @@ import pytest
 
 def test_product_import(test_client):
 
-    test_csv_file = 'test_products.csv'
+    test_csv_file = 'tests/test_products.csv'
 
     with open(test_csv_file, 'r') as csv_file:
 
