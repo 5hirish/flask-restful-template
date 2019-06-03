@@ -1,7 +1,5 @@
-import logging
-import sys
 import os
-from celery import Celery, states
+from celery import Celery
 
 from erpro.service.core import create_app
 from erpro.config import DevConfig, TestConfig, ProdConfig

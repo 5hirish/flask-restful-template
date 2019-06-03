@@ -1,6 +1,5 @@
 import csv
 import codecs
-import io
 from datetime import datetime
 from celery.utils.log import get_task_logger
 
