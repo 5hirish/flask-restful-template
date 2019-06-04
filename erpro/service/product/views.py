@@ -1,7 +1,7 @@
 import time
 
 from flask import Blueprint, request, jsonify, current_app
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, or_
 from botocore.exceptions import NoCredentialsError, ClientError
 
 from erpro.service.extensions import db
@@ -99,90 +99,22 @@ def product_import(file_type):
 
 
 @product_blueprint.route('/', methods=["GET"])
-def product_search():
-    """
-    Search Products.
-    Filter Products.
-    :return: The matching products
-    """
-
-    product_sku = request.args.get("sku")
-    product_name = request.args.get("name")
-    product_status = request.args.get("status")
-
-    if (product_sku is not None and product_sku != "") \
-            or (product_name is not None and product_name != ""):
-        product_results = []
-
-        if product_sku is not None and product_sku != "":
-            if product_status is not None and product_status != "":
-                product_res = ErpProductsModel.query.filter_by(productSKU=product_sku, productStatus=product_status) \
-                    .one_or_none()
-            else:
-                product_res = ErpProductsModel.query.filter_by(productSKU=product_sku).one_or_none()
-            if product_res is not None:
-                product_results = [product_res]
-
-        elif product_name is not None and product_name != "":
-            if product_status is not None and product_status != "":
-                product_results = ErpProductsModel.query.filter(and_(
-                    ErpProductsModel.productName.ilike('%' + product_name + '%'),
-                    ErpProductsModel.productStatus == product_status
-                )).all()
-
-            else:
-                product_results = ErpProductsModel.query.filter(
-                    ErpProductsModel.productName.ilike('%' + product_name + '%')).all()
-        else:
-            product_results = None
-
-        if product_results is not None and len(product_results) > 0:
-            product_list = []
-            for product in product_results:
-                if product is not None:
-                    product = {
-                        "name": product.productName,
-                        "sku": product.productSKU,
-                        "description": product.productDescription,
-                        "status": product.productStatus,
-                        "modifiedOn": product.productModifiedOn
-                    }
-                    product_list.append(product)
-
-            return jsonify({
-                "status": "success",
-                "msg": "Fetched {0} product".format(product_sku),
-                "data": product_list
-            }), 200
-
-        else:
-            return jsonify({
-                "status": "failure",
-                "msg": "No products found for the criteria",
-                "errorCode": "NOT_FOUND"
-            }), 200
-
-    return jsonify(
-        {
-            "status": "failure",
-            "msg": "Missing query parameters",
-            "errorCode": "INVALID_PAYLOAD"
-        }
-    ), 200
-
-
-@product_blueprint.route('/all', methods=["GET"])
 def product_fetch():
     """
     View all of the products.
+    Search products by name or by sku or by both
+    Filter products by status
     Default page 1 and limit 100
     :return: Pagination
     """
     page_limit, page_num = 100, 1
 
+    product_sku = request.args.get("sku")
+    product_name = request.args.get("name", "null")
+    product_status = request.args.get("status")
+
     page_limit_str = request.args.get("limit", 100)
     page_num_str = request.args.get("page", 1)
-    product_status = request.args.get("status")
 
     if page_limit_str is not None and page_limit_str != "":
         try:
@@ -198,18 +130,28 @@ def product_fetch():
 
     if 0 < page_limit <= 1000 and 0 < page_num:
 
-        total_products = ErpProductsModel.query.count()
+        if product_sku is None and product_name == "null":
+
+            products_cursor = ErpProductsModel.query
+
+        else:
+            products_cursor = ErpProductsModel.query.filter(
+                or_(
+                    ErpProductsModel.productName.ilike('%' + product_name + '%'),
+                    ErpProductsModel.productSKU == product_sku
+                ))
 
         if product_status is not None and product_status != "":
-            page_products = ErpProductsModel.query.filter_by(productStatus=product_status) \
-                .paginate(page_num, per_page=page_limit, error_out=False)
-        else:
-            page_products = ErpProductsModel.query.paginate(page_num, per_page=page_limit, error_out=False)
+            products_cursor = products_cursor.filter_by(productStatus=product_status)
+
+        total_products = products_cursor.count()
+        page_products = products_cursor.paginate(page_num, per_page=page_limit, error_out=False)
 
         if page_products is not None and page_products.items is not None and len(page_products.items) > 0:
             list_products = []
             for cur_product in page_products.items:
                 product = {
+                    "sku": cur_product.productSKU,
                     "name": cur_product.productName,
                     "description": cur_product.productDescription,
                     "status": cur_product.productStatus,
@@ -227,7 +169,7 @@ def product_fetch():
 
         return jsonify({
             "status": "failure",
-            "msg": "Products fetch out of bounds",
+            "msg": "No products found matching the criteria",
             "errorCode": "NOT_FOUND"
         }), 200
 

@@ -46,8 +46,6 @@ class DevConfig(Config):
 
     SENTRY_DSN = ""
 
-    CELERY_TASK_ALWAYS_EAGER = True
-
 
 class TestConfig(Config):
     """Test configuration."""
