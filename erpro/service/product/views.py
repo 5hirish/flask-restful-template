@@ -1,7 +1,7 @@
 import time
 
 from flask import Blueprint, request, jsonify, current_app
-from sqlalchemy.sql.expression import and_, or_
+from sqlalchemy.sql.expression import or_
 from botocore.exceptions import NoCredentialsError, ClientError
 
 from erpro.service.extensions import db
