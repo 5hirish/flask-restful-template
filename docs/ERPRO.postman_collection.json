@@ -375,7 +375,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseUrl}}/product/?sku=help-return-art&status=active&name=Lauren",
+					"raw": "{{baseUrl}}/product/?sku=help-return-art&status=inactive&name=Lauren&limit=2&page=2",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -391,13 +391,23 @@
 						},
 						{
 							"key": "status",
-							"value": "active",
+							"value": "inactive",
 							"description": "Product status `active` or `inactive`"
 						},
 						{
 							"key": "name",
 							"value": "Lauren",
 							"description": "Product Name"
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"description": "Products per page (Default 100)"
+						},
+						{
+							"key": "page",
+							"value": "2",
+							"description": "Page number (Default 1)"
 						}
 					]
 				},
@@ -487,271 +497,6 @@
 					],
 					"cookie": [],
 					"body": "{\"data\":[{\"description\":\"Smile yet fear society theory help. Rather thing language skill since heart across wait. According ask them government or.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Lauren Smith\",\"sku\":\"grow-we-decide-job\",\"status\":\"inactive\"}],\"msg\":\"Fetched None product\",\"status\":\"success\"}\n"
-				},
-				{
-					"name": "Import Products Copy",
-					"originalRequest": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded",
-								"disabled": false
-							}
-						],
-						"body": {
-							"mode": "file",
-							"file": {}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/product/",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"product",
-								""
-							]
-						}
-					},
-					"status": "OK",
-					"code": 200,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Content-Length",
-							"value": "50",
-							"name": "Content-Length",
-							"description": "The length of the response body in octets (8-bit bytes)"
-						},
-						{
-							"key": "Content-Type",
-							"value": "application/json",
-							"name": "Content-Type",
-							"description": "The mime type of this content"
-						},
-						{
-							"key": "Date",
-							"value": "Thu, 30 May 2019 12:03:25 GMT",
-							"name": "Date",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"key": "Server",
-							"value": "Werkzeug/0.14.1 Python/3.6.5",
-							"name": "Server",
-							"description": "A name for the server"
-						}
-					],
-					"cookie": [],
-					"body": "{\"msg\":\"Deleted all products\",\"status\":\"success\"}\n"
-				}
-			]
-		},
-		{
-			"name": "Fetch all Products",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/product/all?limit=500&status=active&page=1",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"product",
-						"all"
-					],
-					"query": [
-						{
-							"key": "limit",
-							"value": "500",
-							"description": "Product limit per page"
-						},
-						{
-							"key": "status",
-							"value": "active",
-							"description": "Product status `active` or `inactive`"
-						},
-						{
-							"key": "page",
-							"value": "1",
-							"description": "Page number"
-						}
-					]
-				},
-				"description": "Fetch all products and paginate. Specify the page number and the limit per page for pagination. Filter by product status. Default page is 1 and limit is 100"
-			},
-			"response": [
-				{
-					"name": "Fetch all Products [failure]",
-					"originalRequest": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded",
-								"disabled": false
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/product/all?limit=500&status=active&page=1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"product",
-								"all"
-							],
-							"query": [
-								{
-									"key": "limit",
-									"value": "500",
-									"description": "Product limit per page"
-								},
-								{
-									"key": "status",
-									"value": "active",
-									"description": "Product status `active` or `inactive`"
-								},
-								{
-									"key": "page",
-									"value": "1",
-									"description": "Page number"
-								}
-							]
-						}
-					},
-					"status": "OK",
-					"code": 200,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Connection",
-							"value": "keep-alive",
-							"name": "Connection",
-							"description": "Options that are desired for the connection"
-						},
-						{
-							"key": "Content-Length",
-							"value": "82",
-							"name": "Content-Length",
-							"description": "The length of the response body in octets (8-bit bytes)"
-						},
-						{
-							"key": "Content-Type",
-							"value": "application/json",
-							"name": "Content-Type",
-							"description": "The mime type of this content"
-						},
-						{
-							"key": "Date",
-							"value": "Fri, 31 May 2019 02:32:21 GMT",
-							"name": "Date",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"key": "Server",
-							"value": "gunicorn/19.9.0",
-							"name": "Server",
-							"description": "A name for the server"
-						},
-						{
-							"key": "Via",
-							"value": "1.1 vegur",
-							"name": "Via",
-							"description": "Informs the client of proxies through which the response was sent."
-						}
-					],
-					"cookie": [],
-					"body": "{\"errorCode\":\"NOT_FOUND\",\"msg\":\"Products fetch out of bounds\",\"status\":\"failure\"}\n"
-				},
-				{
-					"name": "Fetch all Products [success]",
-					"originalRequest": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/product/all?limit=500&status=inactive&page=1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"product",
-								"all"
-							],
-							"query": [
-								{
-									"key": "limit",
-									"value": "500",
-									"description": "Product limit per page"
-								},
-								{
-									"key": "status",
-									"value": "inactive",
-									"description": "Product status `active` or `inactive`"
-								},
-								{
-									"key": "page",
-									"value": "1",
-									"description": "Page number"
-								}
-							]
-						}
-					},
-					"status": "OK",
-					"code": 200,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Connection",
-							"value": "keep-alive",
-							"name": "Connection",
-							"description": "Options that are desired for the connection"
-						},
-						{
-							"key": "Content-Length",
-							"value": "5010",
-							"name": "Content-Length",
-							"description": "The length of the response body in octets (8-bit bytes)"
-						},
-						{
-							"key": "Content-Type",
-							"value": "application/json",
-							"name": "Content-Type",
-							"description": "The mime type of this content"
-						},
-						{
-							"key": "Date",
-							"value": "Thu, 30 May 2019 19:24:58 GMT",
-							"name": "Date",
-							"description": "The date and time that the message was sent"
-						},
-						{
-							"key": "Server",
-							"value": "gunicorn/19.9.0",
-							"name": "Server",
-							"description": "A name for the server"
-						},
-						{
-							"key": "Via",
-							"value": "1.1 vegur",
-							"name": "Via",
-							"description": "Informs the client of proxies through which the response was sent."
-						}
-					],
-					"cookie": [],
-					"body": "{\"data\":[{\"description\":\"Art community floor adult your single type. Per back community former stock thing.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Bryce James Jones\",\"status\":\"inactive\"},{\"description\":\"Produce successful hot tree past action young song. Himself then tax eye little last state vote. Country down list that speech economy leave.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"John Robinson\",\"status\":\"inactive\"},{\"description\":\"Choice should lead budget task. Author best mention.\\r\\nOften stuff professional today allow after door instead. Model seat fear evidence. Now sing opportunity feeling no season show.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Theresa Taylor\",\"status\":\"inactive\"},{\"description\":\"Important fight wrong position fine. Friend song interview glass pay. Organization possible just.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Roger Huerta\",\"status\":\"inactive\"},{\"description\":\"Alone maybe education risk despite way.\\r\\nWant benefit manage financial story term must. Former wife activity firm example later. Black win rest ask.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"John Buckley\",\"status\":\"inactive\"},{\"description\":\"Born tree wind.\\r\\nBoy marriage begin value. Record health laugh ask under notice federal. Hard lose need sell treatment.\\r\\nCertain throw executive front late. Because truth risk.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Tiffany H Johnson\",\"status\":\"inactive\"},{\"description\":\"Pm daughter thousand.\\r\\nProcess eat employee have they example past.\\r\\nIncrease author water. Magazine child mention start.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Roy Golden DDS\",\"status\":\"inactive\"},{\"description\":\"Under its near. Necessary education game everybody.\\r\\nHospital upon suffer year discussion south government nothing. Knowledge race population exist against must wear level. Coach girl situation.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"David Wright\",\"status\":\"inactive\"},{\"description\":\"I lose positive manage reason option. Crime structure space both traditional teacher that.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Anthony Burch\",\"status\":\"inactive\"},{\"description\":\"Smile yet fear society theory help. Rather thing language skill since heart across wait. According ask them government or.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Lauren Smith\",\"status\":\"inactive\"},{\"description\":\"Peace happy letter small some worker plant be. Play until activity season what none.\\r\\nMay serious professor whom president order. War adult number certainly also.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Bailey Cox\",\"status\":\"inactive\"},{\"description\":\"See sea guy fire car.\\r\\nLose how floor main agency. Ability cold can message. Expect camera movie.\\r\\nSave training sign history alone. Sell maybe conference pay several indicate.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Jeffrey Davis\",\"status\":\"inactive\"},{\"description\":\"Exactly surface month such him. Life our cut give. Mouth under example away instead certain edge phone.\\r\\nWeight common indicate whose car watch work over. Step garden process.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Lisa Sanchez\",\"status\":\"inactive\"},{\"description\":\"Language somebody baby scientist film dream ball. Develop listen crime poor fill particular.\\r\\nInto risk line a. Lose discover still home southern cell reduce.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Jamie Johnson\",\"status\":\"inactive\"},{\"description\":\"Company employee miss soldier history education. Control here question loss moment cut international. Clearly mind another community impact board.\\r\\nEstablish watch trouble by.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Christina Campbell\",\"status\":\"inactive\"},{\"description\":\"Push enter everything society. Type stuff reflect. Front four charge issue remember. Sure.\\r\\nThese do role drive state. Hour move raise operation pass. Base any trouble fund environment experience end.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Douglas Curtis\",\"status\":\"inactive\"},{\"description\":\"Myself none see short. Produce lead provide finish actually. Should international type usually control floor agent city.\\r\\nGive good matter. Likely better say agency art.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Arthur Johnson\",\"status\":\"inactive\"},{\"description\":\"More particularly answer himself may. Do cultural only social where Mrs though. Air field turn good lot something.\\r\\nTeach something or it effort remain.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Brian Zamora\",\"status\":\"inactive\"},{\"description\":\"Natural little admit call. Effect economic painting factor different almost. Together least walk key kid necessary. Everybody main stock keep.\",\"modifiedOn\":\"Thu, 30 May 2019 00:00:00 GMT\",\"name\":\"Jennifer May\",\"status\":\"inactive\"}],\"msg\":\"Fetched products 19\",\"status\":\"success\",\"totalProducts\":19}\n"
 				},
 				{
 					"name": "Import Products Copy",
