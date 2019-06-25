@@ -12,7 +12,7 @@ app_name = 'foobar'
 
 def create_app(config_object=ProdConfig, enable_blueprints=True):
 
-    app = Flask(__name__)
+    app = Flask(app_name)
 
     app.config.from_object(config_object)
     register_extensions(app)
@@ -56,11 +56,11 @@ def register_error_handlers(app):
         # If a HTTPException, pull the `code` attribute; default to 500
         error_code = getattr(error, 'code', 500)
         if error_code == 404:
-            return jsonify({"status": "failure", "text": "API request not found :("}), 200
+            return jsonify({"status": "failure", "text": "API request not found :("}), error_code
         elif error_code == 405:
-            return jsonify({"status": "failure", "text": "API request method is not allowed :/"}), 200
+            return jsonify({"status": "failure", "text": "API request method is not allowed :/"}), error_code
         elif error_code == 500:
-            return jsonify({"status": "failure", "text": "Something went wrong with this API request X("}), 200
+            return jsonify({"status": "failure", "text": "Something went wrong with this API request X("}), error_code
     for errcode in [404, 405, 500]:
         app.errorhandler(errcode)(return_error)
     return None
@@ -78,7 +78,7 @@ def register_route(app):
     def init_api():
         return jsonify(
             {
-                "name": "ERPRO",
+                "name": "FooBar",
                 "time": datetime.utcnow(),
                 "developer": "5hirish",
                 "website": "www.5hirish.com",

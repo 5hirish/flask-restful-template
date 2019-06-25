@@ -12,7 +12,7 @@ class Config:
         app_debug = False
 
     SECRET_KEY = os.getenv("SECRET_KEY")
-    SESSION_COOKIE_NAME = 'erpro_app'
+    SESSION_COOKIE_NAME = 'foobar_app'
 
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
