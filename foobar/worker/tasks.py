@@ -3,12 +3,12 @@ import codecs
 from datetime import datetime
 from celery.utils.log import get_task_logger
 
-from erpro.service.extensions import db
-from erpro.worker.core import celery_task, BaseTask
-from erpro.service.product.models import ErpProductsModel
-from erpro.utils import get_aws_client
+from foobar.service.extensions import db
+from foobar.worker.core import celery_task, BaseTask
+from foobar.service.product.models import ErpProductsModel
+from foobar.utils import get_aws_client
 
-task_base_name = "erpro.worker."
+task_base_name = "foobar.worker."
 logger = get_task_logger(__name__)
 
 

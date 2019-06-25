@@ -1,6 +1,6 @@
 import pytest
-from erpro.service.core import create_app
-from erpro.config import TestConfig
+from foobar.service.core import create_app
+from foobar.config import TestConfig
 
 
 @pytest.fixture(scope="module")

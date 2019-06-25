@@ -4,10 +4,10 @@ import os
 from flask import Flask, jsonify
 from datetime import datetime
 
-from erpro.config import ProdConfig
-from erpro.service.extensions import migrate, db
+from foobar.config import ProdConfig
+from foobar.service.extensions import migrate, db
 
-app_name = 'erpro'
+app_name = 'foobar'
 
 
 def create_app(config_object=ProdConfig, enable_blueprints=True):
@@ -41,7 +41,7 @@ def register_extensions(app):
 def register_blueprints(app):
 
     # defer the import until it is really needed
-    from erpro.service.product.views import product_blueprint
+    from foobar.service.product.views import product_blueprint
 
     """Register Flask blueprints."""
     app.register_blueprint(product_blueprint)
@@ -95,7 +95,7 @@ def register_logger(app):
     # create file handler which logs even debug messages
     os.makedirs(os.path.dirname(log_dir), exist_ok=True)
 
-    fh = logging.FileHandler(os.path.join(log_dir, 'erpro.log'))
+    fh = logging.FileHandler(os.path.join(log_dir, 'foobar.log'))
 
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level

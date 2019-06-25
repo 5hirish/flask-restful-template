@@ -4,10 +4,10 @@ from flask import Blueprint, request, jsonify, current_app
 from sqlalchemy.sql.expression import or_
 from botocore.exceptions import NoCredentialsError, ClientError
 
-from erpro.service.extensions import db
-from erpro.service.product.models import ErpProductsModel
-from erpro.worker.tasks import import_products
-from erpro.utils import get_aws_client
+from foobar.service.extensions import db
+from foobar.service.product.models import ErpProductsModel
+from foobar.worker.tasks import import_products
+from foobar.utils import get_aws_client
 
 blue_print_name = 'product'
 blue_print_prefix = '/product'

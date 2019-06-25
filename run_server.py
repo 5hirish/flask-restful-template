@@ -1,6 +1,6 @@
 import os
-from erpro.service.core import create_app
-from erpro.config import DevConfig, TestConfig, ProdConfig
+from foobar.service.core import create_app
+from foobar.config import DevConfig, TestConfig, ProdConfig
 
 
 def configure_app():

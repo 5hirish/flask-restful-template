@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.dialects.postgresql import VARCHAR, DATE, TEXT
 # from sqlalchemy.types import VARCHAR, DATE, TEXT  # Generic types
 
-from erpro.service.extensions import db
+from foobar.service.extensions import db
 
 # Alias common SQLAlchemy names
 Column = db.Column
