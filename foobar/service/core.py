@@ -5,9 +5,10 @@ from flask import Flask, jsonify
 from datetime import datetime
 
 from foobar.config import ProdConfig
-from foobar.service.extensions import migrate, db
+from foobar.service.extensions import api, migrate, sql_db
 
 app_name = 'foobar'
+contact_address = 'mail@5hirish.com'
 
 
 def create_app(config_object=ProdConfig, enable_blueprints=True):
@@ -32,8 +33,9 @@ def create_app(config_object=ProdConfig, enable_blueprints=True):
 def register_extensions(app):
     """Register Flask extensions."""
 
-    db.init_app(app)
-    migrate.init_app(app, db)
+    api.init_app(app, title="Shout APIs", contact_email=contact_address)
+    sql_db.init_app(app)
+    migrate.init_app(app, sql_db)
 
     return None
 
@@ -41,7 +43,7 @@ def register_extensions(app):
 def register_blueprints(app):
 
     # defer the import until it is really needed
-    from foobar.service.product.views import product_blueprint
+    from foobar.service.products.views import product_blueprint
 
     """Register Flask blueprints."""
     app.register_blueprint(product_blueprint)

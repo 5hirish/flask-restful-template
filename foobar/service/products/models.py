@@ -3,12 +3,12 @@ from datetime import datetime
 # from sqlalchemy.dialects.postgresql import VARCHAR, DATE, TEXT
 from sqlalchemy.types import VARCHAR, DATE, TEXT  # Generic types
 
-from foobar.service.extensions import db
+from foobar.service.extensions import sql_db
 
 # Alias common SQLAlchemy names
-Column = db.Column
-Relationship = db.relationship
-Model = db.Model
+Column = sql_db.Column
+Relationship = sql_db.relationship
+Model = sql_db.Model
 
 
 class ErpProductsModel(Model):

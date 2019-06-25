@@ -3,17 +3,17 @@ from flask_restplus import fields
 
 product_search_payload_schema = {
     "sku": fields.String(description="Product SKU/Id"),
-    "name": fields.String(description="Name of the product"),
+    "name": fields.String(description="Name of the products"),
     "limit": fields.Integer(description="Number products per page"),
     "page": fields.Integer(description="Page number to iterate"),
-    "status": fields.String(description="Status of the product", enum=['active', 'inactive']),
+    "status": fields.String(description="Status of the products", enum=['active', 'inactive']),
 }
 
 product_schema = {
     "sku": fields.String(description="Product SKU/Id"),
-    "name": fields.String(description="Name of the product"),
+    "name": fields.String(description="Name of the products"),
     "description": fields.String(description="Product description"),
-    "status": fields.String(description="Status of the product", enum=['active', 'inactive']),
+    "status": fields.String(description="Status of the products", enum=['active', 'inactive']),
     "modifiedOn": fields.String(description="Account connected emails")
 }
 

@@ -5,7 +5,7 @@ from celery.utils.log import get_task_logger
 
 from foobar.service.extensions import db
 from foobar.worker.core import celery_task, BaseTask
-from foobar.service.product.models import ErpProductsModel
+from foobar.service.products.models import ErpProductsModel
 from foobar.utils import get_aws_client
 
 task_base_name = "foobar.worker."
