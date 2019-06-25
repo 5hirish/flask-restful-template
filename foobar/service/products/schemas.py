@@ -9,6 +9,10 @@ product_search_payload_schema = {
     "status": fields.String(description="Status of the products", enum=['active', 'inactive']),
 }
 
+product_status_payload_schema = {
+    "status": fields.String(description="Status of the products", enum=['active', 'inactive']),
+}
+
 product_schema = {
     "sku": fields.String(description="Product SKU/Id"),
     "name": fields.String(description="Name of the products"),

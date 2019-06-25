@@ -7,7 +7,8 @@ from botocore.exceptions import NoCredentialsError, ClientError
 
 from foobar.service.extensions import sql_db
 from foobar.service.schemas import success_schema, error_schema
-from foobar.service.products.schemas import product_list_response_schema, product_search_payload_schema
+from foobar.service.products.schemas import product_list_response_schema, product_search_payload_schema, \
+    product_status_payload_schema
 from foobar.service.products.models import ErpProductsModel
 from foobar.worker.tasks import import_products
 from foobar.utils import get_aws_client
@@ -33,11 +34,15 @@ api_v1_ns = api_v1.namespace(ns_prefix_v1, description='Product CRUD operations'
 success_model = api_v1_ns.model('Success', success_schema)
 error_model = api_v1_ns.model('Error', error_schema)
 
+product_search_payload_model = api_v1_ns.model('Product search filters',
+                                          product_search_payload_schema)
+product_status_payload_model = api_v1_ns.model('Product status filters',
+                                          product_status_payload_schema)
+
 product_import_model = api_v1_ns.model('Product upload and import from file',
                                        product_search_payload_schema)
-
-fb_connect_account_success_model = api_v1_ns.inherit('Fetch filtered products', success_model,
-                                                     product_list_response_schema)
+product_list_filtered_success_model = api_v1_ns.inherit('Fetch filtered products', success_model,
+                                                        product_list_response_schema)
 
 
 @product_blueprint.before_request
@@ -55,10 +60,10 @@ class ProductsCollection(Resource):
     product_status_types = ["active", "inactive"]
     allowed_file_extensions = ['csv']
 
-    @api_v1_ns.response(code=202, model=success_model, description="Import Job scheduled")
-    @api_v1_ns.response(code=424, model=error_model, description="Error schema")
-    @api_v1_ns.response(code=413, model=error_model, description="Error schema")
+    @api_v1.expect(product_search_payload_model)
+    @api_v1_ns.response(code=200, model=product_list_filtered_success_model, description="Product filtered")
     @api_v1_ns.response(code=400, model=error_model, description="Error schema")
+    @api_v1_ns.response(code=404, model=error_model, description="Error schema")
     def get(self, product_sku=None):
         """
         View all of the products.
@@ -142,6 +147,9 @@ class ProductsCollection(Resource):
             }
         ), 400
 
+    @api_v1.expect(product_status_payload_model)
+    @api_v1_ns.response(code=200, model=success_schema, description="Product updated")
+    @api_v1_ns.response(code=400, model=error_model, description="Error schema")
     def patch(self, product_sku=None):
         """
         Mark products active/inactvie products
@@ -174,6 +182,10 @@ class ProductsCollection(Resource):
             }
         ), 400
 
+    @api_v1_ns.response(code=202, model=success_model, description="Import Job scheduled")
+    @api_v1_ns.response(code=424, model=error_model, description="Error schema")
+    @api_v1_ns.response(code=413, model=error_model, description="Error schema")
+    @api_v1_ns.response(code=400, model=error_model, description="Error schema")
     def put(self, product_sku=None):
         """
         Import CSV file of products and upsert the data.
@@ -249,6 +261,7 @@ class ProductsCollection(Resource):
             }
         ), 400
 
+    @api_v1_ns.response(code=200, model=success_model, description="Deleted products model")
     def delete(self, product_sku=None):
         """
             Delete all existing products
