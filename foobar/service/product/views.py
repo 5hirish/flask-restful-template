@@ -1,4 +1,4 @@
-import time
+import uuid
 
 from flask import Blueprint, request, jsonify, current_app
 from sqlalchemy.sql.expression import or_
@@ -22,7 +22,7 @@ def perform_before_request():
     pass
 
 
-@product_blueprint.route('/<string:file_type>/import', methods=["POST"])
+@product_blueprint.route('/<string:file_type>/import', methods=["PUT"])
 def product_import(file_type):
     """
     Import CSV file of products and upsert the data.
@@ -55,8 +55,8 @@ def product_import(file_type):
 
         if request.stream.limit <= current_app.config.get("FILE_STREAM_LIMIT") and is_bucket_present:
 
-            current_time_milli = str(round(time.time() * 1000))
-            file_name = current_time_milli + "." + file_type
+            unique_file_name = str(uuid.uuid4())
+            file_name = unique_file_name + "." + file_type
 
             s3_client.upload_fileobj(request.stream, s3_bucket_name, file_name)
 
@@ -72,14 +72,14 @@ def product_import(file_type):
                     "status": "success",
                     "msg": "Products scheduled for import",
                 }
-            ), 200
+            ), 202
 
         elif not is_bucket_present:
             return jsonify({
                     "status": "failure",
                     "errorCode": "BUCKET_FAILED",
                     "msg": "Failed to connect to Storage bucket",
-                }), 200
+                }), 424
         else:
             return jsonify(
                 {
@@ -87,7 +87,7 @@ def product_import(file_type):
                     "errorCode": "STREAM_LIMIT_EXCEEDED",
                     "msg": "Products upload is limited to 50GB",
                 }
-            ), 200
+            ), 413
 
     return jsonify(
         {
@@ -95,7 +95,7 @@ def product_import(file_type):
             "errorCode": "INVALID_PAYLOAD",
             "msg": "Products importing failed",
         }
-    ), 200
+    ), 400
 
 
 @product_blueprint.route('/', methods=["GET"])
@@ -118,7 +118,7 @@ def product_fetch():
 
     if page_limit_str is not None and page_limit_str != "":
         try:
-            page_limit = int(page_limit_str)
+            page_limit = min(int(page_limit_str), 100)
         except ValueError:
             page_limit = 100
 
@@ -171,7 +171,7 @@ def product_fetch():
             "status": "failure",
             "msg": "No products found matching the criteria",
             "errorCode": "NOT_FOUND"
-        }), 200
+        }), 404
 
     return jsonify(
         {
@@ -179,25 +179,35 @@ def product_fetch():
             "msg": "Invalid page parameters",
             "errorCode": "INVALID_PAYLOAD"
         }
-    ), 200
+    ), 400
 
 
-@product_blueprint.route('/{string:sku}/{string:status}', methods=["POST"])
-def product_mark():
+@product_blueprint.route('/{string:sku}/{string:status}', methods=["PATCH"])
+def product_mark(sku, status):
     """
     Mark product active/inactvie products
     :return:
     """
+    if sku is not None and sku != "" and status is not None and status.lower() in ["active", "inactive"]:
+        product = db.session.query(ErpProductsModel.productSKU == sku).one_or_none()
+        if product is not None:
+            product.productStatus = status.lower()
+            db.session.commit()
 
-    db.session.query(ErpProductsModel).delete()
-    db.session.commit()
+            return jsonify(
+                {
+                    "status": "success",
+                    "msg": "Updated product status",
+                }
+            ), 200
 
     return jsonify(
         {
-            "status": "success",
-            "msg": "Deleted all products",
+            "status": "failure",
+            "msg": "Invalid page parameters",
+            "errorCode": "INVALID_PAYLOAD"
         }
-    ), 200
+    ), 400
 
 
 @product_blueprint.route('/', methods=["DELETE"])
