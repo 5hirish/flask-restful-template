@@ -7,7 +7,7 @@ def test_product_import(test_client):
 
     with open(test_csv_file, 'r') as csv_file:
 
-        response = test_client.post('/products/csv/import', data=csv_file)
+        response = test_client.put('/products/', data=csv_file)
 
         json_data = response.json
         assert response.status_code == 200
