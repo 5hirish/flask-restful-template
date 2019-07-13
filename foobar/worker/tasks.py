@@ -3,7 +3,7 @@ import codecs
 from datetime import datetime
 from celery.utils.log import get_task_logger
 
-from foobar.service.extensions import db
+from foobar.service.extensions import sql_db
 from foobar.worker.core import celery_task, BaseTask
 from foobar.service.products.models import ErpProductsModel
 from foobar.utils import get_aws_client
@@ -53,14 +53,14 @@ def import_products(file_name):
 
                 existing_product = ErpProductsModel.query.filter_by(productSKU=row.get("sku")).one_or_none()
                 if existing_product is not None:
-                    db.session.merge(erp_product)
-                    db.session.flush()
+                    sql_db.session.merge(erp_product)
+                    sql_db.session.flush()
                 else:
-                    db.session.add(erp_product)
+                    sql_db.session.add(erp_product)
 
                 logger.info("Committing data to database")
 
-                db.session.commit()
+                sql_db.session.commit()
 
         response = s3_client.delete_object(Bucket=s3_bucket_name, Key=file_name)
         logger.info("File deleted from bucket: {0}".format(response))

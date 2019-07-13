@@ -35,14 +35,16 @@ success_model = api_v1_ns.model('Success', success_schema)
 error_model = api_v1_ns.model('Error', error_schema)
 
 product_search_payload_model = api_v1_ns.model('Product search filters',
-                                          product_search_payload_schema)
+                                               product_search_payload_schema)
 product_status_payload_model = api_v1_ns.model('Product status filters',
-                                          product_status_payload_schema)
+                                               product_status_payload_schema)
 
 product_import_model = api_v1_ns.model('Product upload and import from file',
                                        product_search_payload_schema)
+product_list_response_model = api_v1_ns.model('Product information',
+                                              product_list_response_schema)
 product_list_filtered_success_model = api_v1_ns.inherit('Fetch filtered products', success_model,
-                                                        product_list_response_schema)
+                                                        product_list_response_model)
 
 
 @product_blueprint.before_request
@@ -61,7 +63,7 @@ class ProductsCollection(Resource):
     allowed_file_extensions = ['csv']
 
     @api_v1.expect(product_search_payload_model)
-    @api_v1_ns.response(code=200, model=product_list_filtered_success_model, description="Product filtered")
+    # @api_v1_ns.response(code=200, model=product_list_filtered_success_model, description="Product filtered")
     @api_v1_ns.response(code=400, model=error_model, description="Error schema")
     @api_v1_ns.response(code=404, model=error_model, description="Error schema")
     def get(self, product_sku=None):
@@ -148,7 +150,7 @@ class ProductsCollection(Resource):
         ), 400
 
     @api_v1.expect(product_status_payload_model)
-    @api_v1_ns.response(code=200, model=success_schema, description="Product updated")
+    @api_v1_ns.response(code=200, model=success_model, description="Product updated")
     @api_v1_ns.response(code=400, model=error_model, description="Error schema")
     def patch(self, product_sku=None):
         """
@@ -170,7 +172,7 @@ class ProductsCollection(Resource):
                 return jsonify(
                     {
                         "status": "success",
-                        "msg": "Updated products status",
+                        "msg": "Updated products status"
                     }
                 ), 200
 
