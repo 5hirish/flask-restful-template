@@ -6,9 +6,7 @@ from sqlalchemy.sql.expression import or_
 from botocore.exceptions import NoCredentialsError, ClientError
 
 from foobar.service.extensions import sql_db
-from foobar.service.schemas import success_schema, error_schema
-from foobar.service.products.schemas import product_list_response_schema, product_search_payload_schema, \
-    product_status_payload_schema
+from foobar.service.products.schemas import ProductsCollectionSchema
 from foobar.service.products.models import ErpProductsModel
 from foobar.worker.tasks import import_products
 from foobar.utils import get_aws_client
@@ -31,20 +29,13 @@ api_v1 = Api(product_blueprint, version='1.0', title='Product APIs', doc='/doc/'
 api_v1_ns = api_v1.namespace(ns_prefix_v1, description='Product CRUD operations')
 
 # ---------- Models -----------
-success_model = api_v1_ns.model('Success', success_schema)
-error_model = api_v1_ns.model('Error', error_schema)
-
-product_search_payload_model = api_v1_ns.model('Product search filters',
-                                               product_search_payload_schema)
-product_status_payload_model = api_v1_ns.model('Product status filters',
-                                               product_status_payload_schema)
-
-product_import_model = api_v1_ns.model('Product upload and import from file',
-                                       product_search_payload_schema)
-product_list_response_model = api_v1_ns.model('Product information',
-                                              product_list_response_schema)
-product_list_filtered_success_model = api_v1_ns.inherit('Fetch filtered products', success_model,
-                                                        product_list_response_model)
+pc_v1_schema = ProductsCollectionSchema(api_v1_ns)
+success_model = pc_v1_schema.get_marshaled_model('success_schema', 'Success')
+error_model = pc_v1_schema.get_marshaled_model('error_schema', 'Error')
+product_search_payload_model = pc_v1_schema.get_marshaled_model('product_search_payload_schema', 'Product search filters')
+product_status_payload_model = pc_v1_schema.get_marshaled_model('product_status_payload_schema', 'Product status filters')
+product_import_model = pc_v1_schema.get_marshaled_model('product_search_payload_schema', 'Product upload and import from file')
+product_list_filtered_success_model = pc_v1_schema.get_marshaled_model('product_list_response_schema', 'Fetch filtered products', 'success_schema')
 
 
 @product_blueprint.before_request
@@ -53,6 +44,7 @@ def perform_before_request():
     pass
 
 
+@api_v1_ns.route('/')
 @api_v1_ns.route('/<string:product_sku>')
 class ProductsCollection(Resource):
     """
@@ -63,7 +55,7 @@ class ProductsCollection(Resource):
     allowed_file_extensions = ['csv']
 
     @api_v1.expect(product_search_payload_model)
-    # @api_v1_ns.response(code=200, model=product_list_filtered_success_model, description="Product filtered")
+    @api_v1_ns.response(code=200, model=product_list_filtered_success_model, description="Product filtered")
     @api_v1_ns.response(code=400, model=error_model, description="Error schema")
     @api_v1_ns.response(code=404, model=error_model, description="Error schema")
     def get(self, product_sku=None):
