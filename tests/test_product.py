@@ -1,5 +1,7 @@
 import pytest
 
+api_version = 'v1/'
+
 
 def test_product_import(test_client):
 
@@ -7,7 +9,7 @@ def test_product_import(test_client):
 
     with open(test_csv_file, 'r') as csv_file:
 
-        response = test_client.put('/products/', data=csv_file)
+        response = test_client.put('/products/'+api_version, data=csv_file)
 
         json_data = response.json
         assert response.status_code == 200
@@ -31,7 +33,7 @@ def test_product_import(test_client):
                            {"status": "failure", "errorCode": "NOT_FOUND"}),
                           ])
 def test_product_search(test_client, input_params, expected_res):
-    response = test_client.get('/products/', query_string=input_params)
+    response = test_client.get('/products/'+api_version, query_string=input_params)
     json_data = response.json
     assert response.status_code == 200
     assert json_data.get("status") == expected_res.get("status")

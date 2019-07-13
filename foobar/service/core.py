@@ -3,12 +3,15 @@ import os
 
 from flask import Flask, jsonify
 from datetime import datetime
+from flask_restplus import Resource
 
 from foobar.config import ProdConfig
 from foobar.service.extensions import api, migrate, sql_db
 
 app_name = 'foobar'
 contact_address = 'mail@5hirish.com'
+description = 'A flask API server template with Unit Tests, Swagger documentation, ' \
+              'ORMs, ORM Migrations, Docker and Kubernetes.'
 
 
 def create_app(config_object=ProdConfig, enable_blueprints=True):
@@ -33,7 +36,7 @@ def create_app(config_object=ProdConfig, enable_blueprints=True):
 def register_extensions(app):
     """Register Flask extensions."""
 
-    api.init_app(app, title="Shout APIs", contact_email=contact_address)
+    api.init_app(app, title="Flask Template APIs", description=description, contact_email=contact_address)
     sql_db.init_app(app)
     migrate.init_app(app, sql_db)
 
@@ -76,17 +79,24 @@ def register_route(app):
     #     # will not attempt to recreate tables already present in the target database.
     #     db.create_all()
 
-    @app.route('/', methods=['GET'])
-    def init_api():
-        return jsonify(
-            {
+    api_ns = api.namespace('', description='Flask API server template by @5hirish    :D')
+
+    @app.before_first_request
+    def before_first_request():
+        # Operations before first request
+        pass
+
+    @api_ns.route('/')
+    class InitApp(Resource):
+        def get(self):
+            """Root API"""
+            return {
                 "name": "FooBar",
                 "time": datetime.utcnow(),
                 "developer": "5hirish",
                 "website": "www.5hirish.com",
                 "blog": "www.shirishkadam.com"
             }
-        )
 
 
 def register_logger(app):

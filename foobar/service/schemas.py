@@ -41,7 +41,6 @@ class SchemaCollection:
 
     def get_marshaled_model(self, schema_name, description='', inherit_from_schema=None):
         schema = self.get_cached_schema(schema_name)
-        print(schema_name, schema, inherit_from_schema, description)
         if schema is not None and schema_name not in self.modelled_schemas:
             if inherit_from_schema is None:
                 model = self.api_namespace.model(description, schema)

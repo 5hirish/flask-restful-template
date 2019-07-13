@@ -6,7 +6,7 @@ from sqlalchemy.sql.expression import or_
 from botocore.exceptions import NoCredentialsError, ClientError
 
 from foobar.service.extensions import sql_db
-from foobar.service.products.schemas import ProductsCollectionSchema
+from foobar.service.products.schemas import ProductsCollectionSchema, product_search_payload_schema, product_status_payload_schema
 from foobar.service.products.models import ErpProductsModel
 from foobar.worker.tasks import import_products
 from foobar.utils import get_aws_client
@@ -32,8 +32,6 @@ api_v1_ns = api_v1.namespace(ns_prefix_v1, description='Product CRUD operations'
 pc_v1_schema = ProductsCollectionSchema(api_v1_ns)
 success_model = pc_v1_schema.get_marshaled_model('success_schema', 'Success')
 error_model = pc_v1_schema.get_marshaled_model('error_schema', 'Error')
-product_search_payload_model = pc_v1_schema.get_marshaled_model('product_search_payload_schema', 'Product search filters')
-product_status_payload_model = pc_v1_schema.get_marshaled_model('product_status_payload_schema', 'Product status filters')
 product_import_model = pc_v1_schema.get_marshaled_model('product_search_payload_schema', 'Product upload and import from file')
 product_list_filtered_success_model = pc_v1_schema.get_marshaled_model('product_list_response_schema', 'Fetch filtered products', 'success_schema')
 
@@ -54,7 +52,7 @@ class ProductsCollection(Resource):
     product_status_types = ["active", "inactive"]
     allowed_file_extensions = ['csv']
 
-    @api_v1.expect(product_search_payload_model)
+    @api_v1.doc(params=product_search_payload_schema)
     @api_v1_ns.response(code=200, model=product_list_filtered_success_model, description="Product filtered")
     @api_v1_ns.response(code=400, model=error_model, description="Error schema")
     @api_v1_ns.response(code=404, model=error_model, description="Error schema")
@@ -141,7 +139,7 @@ class ProductsCollection(Resource):
             }
         ), 400
 
-    @api_v1.expect(product_status_payload_model)
+    @api_v1.doc(params=product_status_payload_schema)
     @api_v1_ns.response(code=200, model=success_model, description="Product updated")
     @api_v1_ns.response(code=400, model=error_model, description="Error schema")
     def patch(self, product_sku=None):
