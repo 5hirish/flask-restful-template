@@ -3,7 +3,7 @@ import os
 
 from flask import Flask, jsonify
 from datetime import datetime
-from flask_restplus import Resource
+from flask_restplus import Resource, Api
 
 from foobar.config import ProdConfig
 from foobar.service.extensions import api, migrate, sql_db
@@ -79,14 +79,12 @@ def register_route(app):
     #     # will not attempt to recreate tables already present in the target database.
     #     db.create_all()
 
-    api_ns = api.namespace('', description='Flask API server template by @5hirish    :D')
-
     @app.before_first_request
     def before_first_request():
         # Operations before first request
         pass
 
-    @api_ns.route('/')
+    @api.route('/about')
     class InitApp(Resource):
         def get(self):
             """Root API"""
