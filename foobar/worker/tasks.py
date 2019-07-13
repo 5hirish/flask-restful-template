@@ -45,13 +45,13 @@ def import_products(file_name):
         for row in product_reader:
             if "name" and "sku" in row:
                 erp_product = ErpProductsModel(
-                    productSKU=row.get("sku"),
-                    productName=row.get("name"),
-                    productDescription=row.get("description"),
-                    productModifiedOn=datetime.utcnow()
+                    product_sku=row.get("sku"),
+                    product_name=row.get("name"),
+                    product_description=row.get("description"),
+                    product_modified_on=datetime.utcnow()
                 )
 
-                existing_product = ErpProductsModel.query.filter_by(productSKU=row.get("sku")).one_or_none()
+                existing_product = ErpProductsModel.query.filter_by(product_sku=row.get("sku")).one_or_none()
                 if existing_product is not None:
                     sql_db.session.merge(erp_product)
                     sql_db.session.flush()

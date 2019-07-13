@@ -14,8 +14,8 @@ Model = sql_db.Model
 class ErpProductsModel(Model):
     __tablename__ = 'products'
 
-    productSKU = Column(VARCHAR(255), primary_key=True, nullable=False)
-    productName = Column(VARCHAR(255), nullable=False)
-    productDescription = Column(TEXT, nullable=True)
-    productStatus = Column(VARCHAR(15), default="inactive", nullable=False)
-    productModifiedOn = Column(DATE, default=datetime.utcnow, nullable=False)
+    product_sku = Column(VARCHAR(255), primary_key=True, nullable=False)
+    product_name = Column(VARCHAR(255), nullable=False)
+    product_description = Column(TEXT, nullable=True)
+    product_status = Column(VARCHAR(15), default="inactive", nullable=False)
+    product_modified_on = Column(DATE, default=datetime.utcnow, nullable=False)

@@ -1,12 +1,13 @@
 import uuid
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, current_app
 from flask_restplus import Api, Resource, fields
 from sqlalchemy.sql.expression import or_
 from botocore.exceptions import NoCredentialsError, ClientError
 
 from foobar.service.extensions import sql_db
-from foobar.service.products.schemas import ProductsCollectionSchema, product_search_payload_schema, product_status_payload_schema
+from foobar.service.products.schemas import ProductsCollectionSchema, product_search_payload_schema, \
+    product_status_payload_schema
 from foobar.service.products.models import ErpProductsModel
 from foobar.worker.tasks import import_products
 from foobar.utils import get_aws_client
@@ -32,8 +33,10 @@ api_v1_ns = api_v1.namespace(ns_prefix_v1, description='Product CRUD operations'
 pc_v1_schema = ProductsCollectionSchema(api_v1_ns)
 success_model = pc_v1_schema.get_marshaled_model('success_schema', 'Success')
 error_model = pc_v1_schema.get_marshaled_model('error_schema', 'Error')
-product_import_model = pc_v1_schema.get_marshaled_model('product_search_payload_schema', 'Product upload and import from file')
-product_list_filtered_success_model = pc_v1_schema.get_marshaled_model('product_list_response_schema', 'Fetch filtered products', 'success_schema')
+product_import_model = pc_v1_schema.get_marshaled_model('product_search_payload_schema',
+                                                        'Product upload and import from file')
+product_list_filtered_success_model = pc_v1_schema.get_marshaled_model('product_list_response_schema',
+                                                                       'Fetch filtered products', 'success_schema')
 
 
 @product_blueprint.before_request
@@ -67,7 +70,6 @@ class ProductsCollection(Resource):
         """
         page_limit, page_num = 100, 1
 
-        product_sku = request.args.get("sku")
         product_name = request.args.get("name", "null")
         product_status = request.args.get("status")
 
@@ -95,12 +97,12 @@ class ProductsCollection(Resource):
             else:
                 products_cursor = ErpProductsModel.query.filter(
                     or_(
-                        ErpProductsModel.productName.ilike('%' + product_name + '%'),
-                        ErpProductsModel.productSKU == product_sku
+                        ErpProductsModel.product_name.ilike('%' + product_name + '%'),
+                        ErpProductsModel.product_sku == product_sku
                     ))
 
             if product_status is not None and product_status != "":
-                products_cursor = products_cursor.filter_by(productStatus=product_status)
+                products_cursor = products_cursor.filter_by(product_status=product_status)
 
             total_products = products_cursor.count()
             page_products = products_cursor.paginate(page_num, per_page=page_limit, error_out=False)
@@ -109,39 +111,38 @@ class ProductsCollection(Resource):
                 list_products = []
                 for cur_product in page_products.items:
                     product = {
-                        "sku": cur_product.productSKU,
-                        "name": cur_product.productName,
-                        "description": cur_product.productDescription,
-                        "status": cur_product.productStatus,
-                        "modifiedOn": cur_product.productModifiedOn
+                        "sku": cur_product.product_sku,
+                        "name": cur_product.product_name,
+                        "description": cur_product.product_description,
+                        "status": cur_product.product_status,
+                        "modifiedOn": cur_product.product_modified_on
                     }
 
                     list_products.append(product)
 
-                return jsonify({
+                return {
                     "status": "success",
                     "msg": "Fetched products {0}".format(len(list_products)),
                     "totalProducts": total_products,
                     "data": list_products
-                }), 200
+                }, 200
 
-            return jsonify({
+            return {
                 "status": "failure",
                 "msg": "No products found matching the criteria",
                 "errorCode": "NOT_FOUND"
-            }), 404
+            }, 404
 
-        return jsonify(
-            {
+        return {
                 "status": "failure",
                 "msg": "Invalid page parameters",
                 "errorCode": "INVALID_PAYLOAD"
-            }
-        ), 400
+            }, 400
 
     @api_v1.doc(params=product_status_payload_schema)
     @api_v1_ns.response(code=200, model=success_model, description="Product updated")
     @api_v1_ns.response(code=400, model=error_model, description="Error schema")
+    @api_v1_ns.response(code=404, model=error_model, description="Error schema")
     def patch(self, product_sku=None):
         """
         Mark products active/inactvie products
@@ -154,25 +155,27 @@ class ProductsCollection(Resource):
         if product_sku is not None and product_sku != "" and product_status is not None \
                 and product_status in self.product_status_types:
 
-            product = sql_db.session.query(ErpProductsModel.productSKU == product_sku).one_or_none()
+            product = ErpProductsModel.query.filter_by(product_sku=product_sku).one_or_none()
             if product is not None:
-                product.productStatus = product_status
+                product.product_status = product_status
                 sql_db.session.commit()
 
-                return jsonify(
-                    {
+                return {
                         "status": "success",
                         "msg": "Updated products status"
-                    }
-                ), 200
+                    }, 200
+            else:
+                return {
+                        "status": "failure",
+                        "msg": "Product not found",
+                        "errorCode": "NOT_FOUND"
+                    }, 404
 
-        return jsonify(
-            {
+        return {
                 "status": "failure",
                 "msg": "Invalid page parameters",
                 "errorCode": "INVALID_PAYLOAD"
-            }
-        ), 400
+            }, 400
 
     @api_v1_ns.response(code=202, model=success_model, description="Import Job scheduled")
     @api_v1_ns.response(code=424, model=error_model, description="Error schema")
@@ -223,35 +226,29 @@ class ProductsCollection(Resource):
                     current_app.logger.info("Task sent to celery worker")
                     import_products.delay(file_name)
 
-                return jsonify(
-                    {
-                        "status": "success",
-                        "msg": "Products scheduled for import",
-                    }
-                ), 202
+                return {
+                           "status": "success",
+                           "msg": "Products scheduled for import",
+                       }, 202
 
             elif not is_bucket_present:
-                return jsonify({
+                return {
                     "status": "failure",
                     "errorCode": "BUCKET_FAILED",
                     "msg": "Failed to connect to Storage bucket",
-                }), 424
+                }, 424
             else:
-                return jsonify(
-                    {
+                return {
                         "status": "failure",
                         "errorCode": "STREAM_LIMIT_EXCEEDED",
                         "msg": "Products upload is limited to 50GB",
-                    }
-                ), 413
+                    }, 413
 
-        return jsonify(
-            {
+        return {
                 "status": "failure",
                 "errorCode": "INVALID_PAYLOAD",
                 "msg": "Products importing failed",
-            }
-        ), 400
+            }, 400
 
     @api_v1_ns.response(code=200, model=success_model, description="Deleted products model")
     def delete(self, product_sku=None):
@@ -260,18 +257,15 @@ class ProductsCollection(Resource):
             :return:
             """
         if product_sku is not None:
-            product = sql_db.session.query(ErpProductsModel.productSKU == product_sku).one_or_none()
-            product.delete()
-
+            product = ErpProductsModel.query.filter_by(product_sku=product_sku).one_or_none()
+            if product is not None:
+                sql_db.session.delete(product)
         else:
-            product_all = sql_db.session.query(ErpProductsModel).all()
-            product_all.delete()
+            product_all = ErpProductsModel.query.delete()
 
         sql_db.session.commit()
 
-        return jsonify(
-            {
-                "status": "success",
-                "msg": "Deleted all products".format(),
-            }
-        ), 200
+        return {
+                   "status": "success",
+                   "msg": "Deleted all products".format(),
+               }, 200
