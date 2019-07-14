@@ -17,14 +17,12 @@ services:
     - "5672:5672"
 
   nginx_reverse_proxy:
-    image: nginx:mainline-alpine
+    image: nginx:mainline
     container_name: nginx
-    restart: unless-stopped
+    restart: always
     ports:
       - "80:80"
       - "443:443"
-#    networks:
-#      - ngnix-network
 
   flask_server:
     image: foobar_api_server:latest
@@ -34,13 +32,11 @@ services:
     container_name: flask
     restart: unless-stopped
     expose:
-      - 8000
+      - "8000"
     depends_on:
     - postgres_database
     - nginx_reverse_proxy
     - rabbitmq_message_broker
-#    networks:
-#      - ngnix-network
     volumes:
     - logs:/foobar/logs
     env_file:
@@ -64,7 +60,3 @@ services:
 
 volumes:
   logs:
-
-#networks:
-#  ngnix-network:
-#    driver: bridge
