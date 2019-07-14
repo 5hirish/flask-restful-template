@@ -2,30 +2,28 @@
 # pip install -r requirements.txt
 
 # Flask
-flask
-watchdog
+flask==1.0.2
+watchdog==0.9.0
 werkzeug[watchdog]
 gunicorn==19.9.0
 
 # Flask Extensions
-flask_sqlalchemy
-flask_migrate
+flask_sqlalchemy==2.4.0
+flask_migrate==2.5.2
 flask-restplus==0.12.1
 
 # Python
-requests
-celery
-pytest
-gunicorn
-boto3
-python-dotenv
+requests==2.18.4
+celery==4.3.0
+boto3==1.9.159
+python-dotenv==0.10.2
 
 # Drivers
-psycopg2
-sqlalchemy
+psycopg2==2.8.2
+sqlalchemy==1.3.4
 
 # Testing
-pytest
+pytest==3.9.1
 pytest-cov==2.5.0
 pytest-flask==0.14.0
-codecov
+codecov==2.0.15

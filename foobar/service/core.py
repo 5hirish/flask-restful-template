@@ -74,15 +74,10 @@ def register_error_handlers(app):
 def register_route(app):
 
     # done by using alembic migrations
-    # @app.before_first_request
-    # def create_tables():
-    #     # will not attempt to recreate tables already present in the target database.
-    #     db.create_all()
-
     @app.before_first_request
-    def before_first_request():
-        # Operations before first request
-        pass
+    def create_tables():
+        # will not attempt to recreate tables already present in the target database.
+        sql_db.create_all()
 
     @api.route('/about')
     class InitApp(Resource):
