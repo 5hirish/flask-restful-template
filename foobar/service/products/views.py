@@ -1,7 +1,7 @@
 import uuid
 
 from flask import Blueprint, request, current_app
-from flask_restplus import Api, Resource, fields
+from flask_restplus import Api, Resource
 from sqlalchemy.sql.expression import or_
 from botocore.exceptions import NoCredentialsError, ClientError
 
@@ -115,7 +115,7 @@ class ProductsCollection(Resource):
                         "name": cur_product.product_name,
                         "description": cur_product.product_description,
                         "status": cur_product.product_status,
-                        "modifiedOn": cur_product.product_modified_on
+                        "modifiedOn": str(cur_product.product_modified_on)
                     }
 
                     list_products.append(product)

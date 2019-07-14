@@ -3,7 +3,7 @@ import os
 
 from flask import Flask, jsonify
 from datetime import datetime
-from flask_restplus import Resource, Api
+from flask_restplus import Resource
 
 from foobar.config import ProdConfig
 from foobar.service.extensions import api, migrate, sql_db
