@@ -9,6 +9,23 @@ services:
     ports:
     - "5432:5432"
 
+  rabbitmq_message_broker:
+    image: rabbitmq:3-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+    - "5672:5672"
+
+  nginx_reverse_proxy:
+    image: nginx:mainline-alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+#    networks:
+#      - ngnix-network
+
   flask_server:
     image: foobar_api_server:latest
     build:
@@ -17,32 +34,17 @@ services:
     container_name: flask
     restart: unless-stopped
     expose:
-      - 5000
+      - 8000
     depends_on:
     - postgres_database
-    networks:
-      - ngnix-network
+    - nginx_reverse_proxy
+    - rabbitmq_message_broker
+#    networks:
+#      - ngnix-network
     volumes:
     - logs:/foobar/logs
-
-  nginx_reverse_proxy:
-    image: nginx:mainline-alpine
-    container_name: nginx
-    restart: unless-stopped
-    ports:
-      - "5000:5000"
-      - "443:443"
-    depends_on:
-      - flask_server
-    networks:
-      - ngnix-network
-
-  rabbitmq_message_broker:
-    image: rabbitmq:3-alpine
-    container_name: rabbitmq
-    restart: unless-stopped
-    ports:
-    - "5672:5672"
+    env_file:
+    - .env
 
   celery_worker:
     image: foobar_worker:latest
@@ -56,11 +58,13 @@ services:
     - rabbitmq_message_broker
     volumes:
     - logs:/foobar/logs
+    env_file:
+    - .env
 
 
 volumes:
   logs:
 
-networks:
-  ngnix-network:
-    driver: bridge
+#networks:
+#  ngnix-network:
+#    driver: bridge
