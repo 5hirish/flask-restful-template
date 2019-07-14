@@ -3,16 +3,20 @@ import os
 
 from flask import Flask, jsonify
 from datetime import datetime
+from flask_restplus import Resource
 
-from erpro.config import ProdConfig
-from erpro.service.extensions import migrate, db
+from foobar.config import ProdConfig
+from foobar.service.extensions import api, migrate, sql_db
 
-app_name = 'erpro'
+app_name = 'foobar'
+contact_address = 'mail@5hirish.com'
+description = 'A flask API server template with Unit Tests, Swagger documentation, ' \
+              'ORMs, ORM Migrations, Docker and Kubernetes.'
 
 
 def create_app(config_object=ProdConfig, enable_blueprints=True):
 
-    app = Flask(__name__)
+    app = Flask(app_name)
 
     app.config.from_object(config_object)
     register_extensions(app)
@@ -32,8 +36,9 @@ def create_app(config_object=ProdConfig, enable_blueprints=True):
 def register_extensions(app):
     """Register Flask extensions."""
 
-    db.init_app(app)
-    migrate.init_app(app, db)
+    api.init_app(app, title="Flask Template APIs", description=description, contact_email=contact_address)
+    sql_db.init_app(app)
+    migrate.init_app(app, sql_db)
 
     return None
 
@@ -41,7 +46,7 @@ def register_extensions(app):
 def register_blueprints(app):
 
     # defer the import until it is really needed
-    from erpro.service.product.views import product_blueprint
+    from foobar.service.products.views import product_blueprint
 
     """Register Flask blueprints."""
     app.register_blueprint(product_blueprint)
@@ -56,11 +61,11 @@ def register_error_handlers(app):
         # If a HTTPException, pull the `code` attribute; default to 500
         error_code = getattr(error, 'code', 500)
         if error_code == 404:
-            return jsonify({"status": "failure", "text": "API request not found :("}), 200
+            return jsonify({"status": "failure", "text": "API request not found :("}), error_code
         elif error_code == 405:
-            return jsonify({"status": "failure", "text": "API request method is not allowed :/"}), 200
+            return jsonify({"status": "failure", "text": "API request method is not allowed :/"}), error_code
         elif error_code == 500:
-            return jsonify({"status": "failure", "text": "Something went wrong with this API request X("}), 200
+            return jsonify({"status": "failure", "text": "Something went wrong with this API request X("}), error_code
     for errcode in [404, 405, 500]:
         app.errorhandler(errcode)(return_error)
     return None
@@ -69,22 +74,22 @@ def register_error_handlers(app):
 def register_route(app):
 
     # done by using alembic migrations
-    # @app.before_first_request
-    # def create_tables():
-    #     # will not attempt to recreate tables already present in the target database.
-    #     db.create_all()
+    @app.before_first_request
+    def create_tables():
+        # will not attempt to recreate tables already present in the target database.
+        sql_db.create_all()
 
-    @app.route('/', methods=['GET'])
-    def init_api():
-        return jsonify(
-            {
-                "name": "ERPRO",
+    @api.route('/about')
+    class InitApp(Resource):
+        def get(self):
+            """Root API"""
+            return {
+                "name": "FooBar",
                 "time": datetime.utcnow(),
                 "developer": "5hirish",
                 "website": "www.5hirish.com",
                 "blog": "www.shirishkadam.com"
             }
-        )
 
 
 def register_logger(app):
@@ -95,7 +100,7 @@ def register_logger(app):
     # create file handler which logs even debug messages
     os.makedirs(os.path.dirname(log_dir), exist_ok=True)
 
-    fh = logging.FileHandler(os.path.join(log_dir, 'erpro.log'))
+    fh = logging.FileHandler(os.path.join(log_dir, 'foobar.log'))
 
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level

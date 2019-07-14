@@ -12,11 +12,10 @@ os:
 env:
   global:
   - PYTHONUNBUFFERED=yes
-  - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@localhost:5432/erpro_test
-  - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/erpro_test
-  - CLOUDAMQP_URL=amqp://guest:guest@127.0.0.1:5672/
+  - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@localhost:5432/foobar_test
+  - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/foobar_test
+  - CELERY_BROKER_URL=amqp://guest:guest@127.0.0.1:5672/
   - SECRET_KEY=travis_ci
-  - AWS_S3_PRODUCT_BUCKET=erpro-temp
 
 #virtualenv:
 #  system_site_packages: true
@@ -32,13 +31,13 @@ install:
   - pip install -r requirements.txt
 
 before_script:
-  - psql -c "create database erpro_test;" -U postgres
+  - psql -c "create database foobar_test;" -U postgres
   - psql -c "alter user postgres with password 'postgres';"
-  - export FLASK_APP="$TRAVIS_BUILD_DIR/erpro/service/core.py"
+  - export FLASK_APP="$TRAVIS_BUILD_DIR/foobar/service/core.py"
   - flask db upgrade
 
 script:
-  - pytest --cov=erpro
+  - pytest --cov=foobar
 
 services:
   - postgresql

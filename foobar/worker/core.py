@@ -1,11 +1,11 @@
 import os
 from celery import Celery
 
-from erpro.service.core import create_app
-from erpro.config import DevConfig, TestConfig, ProdConfig
+from foobar.service.core import create_app
+from foobar.config import DevConfig, TestConfig, ProdConfig
 
-# celery worker -A erpro.worker.core.celery_task --loglevel=DEBUG
-# celery flower -A erpro.worker.core.celery_task
+# celery worker -A foobar.worker.core.celery_task --loglevel=DEBUG
+# celery flower -A foobar.worker.core.celery_task
 
 
 flask_env = str(os.environ.get('FLASK_ENV'))
@@ -23,7 +23,7 @@ task_app.app_context().push()
 # logger = get_logger()
 celery_task = Celery()
 celery_task.config_from_object(task_app.config, namespace='CELERY')
-celery_task.autodiscover_tasks(packages=['erpro.worker'])
+celery_task.autodiscover_tasks(packages=['foobar.worker'])
 
 
 class BaseTask(celery_task.Task):

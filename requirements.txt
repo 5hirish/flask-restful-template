@@ -1,19 +1,29 @@
-requests
-sqlalchemy
-celery
-pytest
-gunicorn
-psycopg2
-boto3
+# Add your pinned requirements with version so that they can be easily installed with:
+# pip install -r requirements.txt
 
-flask
-watchdog
+# Flask
+flask==1.0.2
+watchdog==0.9.0
 werkzeug[watchdog]
-flask_sqlalchemy
-flask_migrate
+gunicorn==19.9.0
 
-python-dotenv
+# Flask Extensions
+flask_sqlalchemy==2.4.0
+flask_migrate==2.5.2
+flask-restplus==0.12.1
 
-pytest
+# Python
+requests==2.18.4
+celery==4.3.0
+boto3==1.9.159
+python-dotenv==0.10.2
+
+# Drivers
+psycopg2==2.8.2
+sqlalchemy==1.3.4
+
+# Testing
+pytest==3.9.1
 pytest-cov==2.5.0
-codecov
+pytest-flask==0.14.0
+codecov==2.0.15

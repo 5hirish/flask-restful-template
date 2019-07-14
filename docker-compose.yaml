@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+
+  postgres_database:
+    image: postgres:10-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+    - "5432:5432"
+
+  flask_server:
+    image: foobar_api_server:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-apiapp
+    container_name: flask
+    restart: unless-stopped
+    expose:
+      - 5000
+    depends_on:
+    - postgres_database
+    networks:
+      - ngnix-network
+    volumes:
+    - logs:/foobar/logs
+
+  nginx_reverse_proxy:
+    image: nginx:mainline-alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+      - "443:443"
+    depends_on:
+      - flask_server
+    networks:
+      - ngnix-network
+
+  rabbitmq_message_broker:
+    image: rabbitmq:3-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+    - "5672:5672"
+
+  celery_worker:
+    image: foobar_worker:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    container_name: celery
+    restart: unless-stopped
+    depends_on:
+    - postgres_database
+    - rabbitmq_message_broker
+    volumes:
+    - logs:/foobar/logs
+
+
+volumes:
+  logs:
+
+networks:
+  ngnix-network:
+    driver: bridge

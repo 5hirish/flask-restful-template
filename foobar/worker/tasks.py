@@ -3,12 +3,12 @@ import codecs
 from datetime import datetime
 from celery.utils.log import get_task_logger
 
-from erpro.service.extensions import db
-from erpro.worker.core import celery_task, BaseTask
-from erpro.service.product.models import ErpProductsModel
-from erpro.utils import get_aws_client
+from foobar.service.extensions import sql_db
+from foobar.worker.core import celery_task, BaseTask
+from foobar.service.products.models import ErpProductsModel
+from foobar.utils import get_aws_client
 
-task_base_name = "erpro.worker."
+task_base_name = "foobar.worker."
 logger = get_task_logger(__name__)
 
 
@@ -45,22 +45,22 @@ def import_products(file_name):
         for row in product_reader:
             if "name" and "sku" in row:
                 erp_product = ErpProductsModel(
-                    productSKU=row.get("sku"),
-                    productName=row.get("name"),
-                    productDescription=row.get("description"),
-                    productModifiedOn=datetime.utcnow()
+                    product_sku=row.get("sku"),
+                    product_name=row.get("name"),
+                    product_description=row.get("description"),
+                    product_modified_on=datetime.utcnow()
                 )
 
-                existing_product = ErpProductsModel.query.filter_by(productSKU=row.get("sku")).one_or_none()
+                existing_product = ErpProductsModel.query.filter_by(product_sku=row.get("sku")).one_or_none()
                 if existing_product is not None:
-                    db.session.merge(erp_product)
-                    db.session.flush()
+                    sql_db.session.merge(erp_product)
+                    sql_db.session.flush()
                 else:
-                    db.session.add(erp_product)
+                    sql_db.session.add(erp_product)
 
                 logger.info("Committing data to database")
 
-                db.session.commit()
+                sql_db.session.commit()
 
         response = s3_client.delete_object(Bucket=s3_bucket_name, Key=file_name)
         logger.info("File deleted from bucket: {0}".format(response))

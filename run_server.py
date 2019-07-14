@@ -1,6 +1,6 @@
 import os
-from erpro.service.core import create_app
-from erpro.config import DevConfig, TestConfig, ProdConfig
+from foobar.service.core import create_app
+from foobar.config import DevConfig, TestConfig, ProdConfig
 
 
 def configure_app():
@@ -14,7 +14,7 @@ def configure_app():
 
 
 app_config = configure_app()
-erpro_app = create_app(app_config)
+foobar_app = create_app(app_config)
 
 # erpro_app.debug = True
 
@@ -26,13 +26,13 @@ if __name__ == '__main__':
         app_debug = False
 
     app_config = configure_app()
-    erpro_app = create_app(app_config)
+    foobar_app = create_app(app_config)
 
-    erpro_app.debug = app_debug
+    foobar_app.debug = app_debug
 
     # Werkzeug, WSGI utility library for Python, enable module reloader
-    erpro_app.run(use_reloader=True,
-                  host=os.environ.get("HOST_IP"),
-                  reloader_interval=0,
-                  use_debugger=app_debug,
-                  reloader_type='watchdog')
+    foobar_app.run(use_reloader=True,
+                   host=os.environ.get("HOST_IP"),
+                   reloader_interval=0,
+                   use_debugger=app_debug,
+                   reloader_type='watchdog')
