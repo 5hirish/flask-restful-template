@@ -16,14 +16,6 @@ services:
     ports:
     - "5672:5672"
 
-  nginx_reverse_proxy:
-    image: nginx:mainline
-    container_name: nginx
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-
   flask_server:
     image: foobar_api_server:latest
     build:
@@ -35,12 +27,23 @@ services:
       - "8000"
     depends_on:
     - postgres_database
-    - nginx_reverse_proxy
     - rabbitmq_message_broker
     volumes:
     - logs:/foobar/logs
     env_file:
     - .env
+
+  nginx_reverse_proxy:
+    image: nginx:mainline
+    container_name: nginx
+    restart: always
+    ports:
+    - "80:80"
+    - "443:443"
+    depends_on:
+      - flask_server
+    volumes:
+    - ./nginx:/etc/nginx/conf.d
 
   celery_worker:
     image: foobar_worker:latest

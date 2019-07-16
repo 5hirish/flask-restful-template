@@ -4,6 +4,7 @@ import os
 from flask import Flask, jsonify
 from datetime import datetime
 from flask_restplus import Resource
+from sqlalchemy.exc import OperationalError
 
 from foobar.config import ProdConfig
 from foobar.service.extensions import api, migrate, sql_db
@@ -61,11 +62,11 @@ def register_error_handlers(app):
         # If a HTTPException, pull the `code` attribute; default to 500
         error_code = getattr(error, 'code', 500)
         if error_code == 404:
-            return jsonify({"status": "failure", "text": "API request not found :("}), error_code
+            return jsonify({"status": "failure", "msg": "API request not found :("}), error_code
         elif error_code == 405:
-            return jsonify({"status": "failure", "text": "API request method is not allowed :/"}), error_code
+            return jsonify({"status": "failure", "msg": "API request method is not allowed :/"}), error_code
         elif error_code == 500:
-            return jsonify({"status": "failure", "text": "Something went wrong with this API request X("}), error_code
+            return jsonify({"status": "failure", "msg": "Something went wrong with this API request X("}), error_code
     for errcode in [404, 405, 500]:
         app.errorhandler(errcode)(return_error)
     return None
@@ -77,19 +78,23 @@ def register_route(app):
     @app.before_first_request
     def create_tables():
         # will not attempt to recreate tables already present in the target database.
-        sql_db.create_all()
+        try:
+            sql_db.create_all()
+        except OperationalError:
+            pass
 
     @api.route('/about')
     class InitApp(Resource):
         def get(self):
             """Root API"""
             return {
+                "status": "success",
                 "name": "FooBar",
                 "time": datetime.utcnow(),
                 "developer": "5hirish",
                 "website": "www.5hirish.com",
                 "blog": "www.shirishkadam.com"
-            }
+            }, 200
 
 
 def register_logger(app):
