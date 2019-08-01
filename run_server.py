@@ -1,19 +1,8 @@
 import os
 from foobar.service.core import create_app
-from foobar.config import DevConfig, TestConfig, ProdConfig
+from foobar.config import get_config
 
-
-def configure_app():
-    flask_env = str(os.environ.get('FLASK_ENV'))
-    if flask_env == 'dev':
-        return DevConfig
-    elif flask_env == 'test':
-        return TestConfig
-    else:
-        return ProdConfig
-
-
-app_config = configure_app()
+app_config = get_config()
 foobar_app = create_app(app_config)
 
 # erpro_app.debug = True

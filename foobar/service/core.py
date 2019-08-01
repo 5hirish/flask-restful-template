@@ -6,7 +6,6 @@ from datetime import datetime
 from flask_restplus import Resource
 from sqlalchemy.exc import OperationalError
 
-from foobar.config import ProdConfig
 from foobar.service.extensions import api, migrate, sql_db
 
 app_name = 'foobar'
@@ -15,7 +14,7 @@ description = 'A flask API server template with Unit Tests, Swagger documentatio
               'ORMs, ORM Migrations, Docker and Kubernetes.'
 
 
-def create_app(config_object=ProdConfig, enable_blueprints=True):
+def create_app(config_object, enable_blueprints=True):
 
     app = Flask(app_name)
 
@@ -98,18 +97,16 @@ def register_route(app):
 
 
 def register_logger(app):
-
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-
     log_dir = "logs/"
     # create file handler which logs even debug messages
     os.makedirs(os.path.dirname(log_dir), exist_ok=True)
 
-    fh = logging.FileHandler(os.path.join(log_dir, 'foobar.log'))
-
-    fh.setLevel(logging.DEBUG)
-    # create console handler with a higher log level
+    app_logger = logging.getLogger(app_name)
+    fh = logging.FileHandler(os.path.join(log_dir, app_name + '.log'))
     ch = logging.StreamHandler()
+
+    app_logger.setLevel(logging.DEBUG)
+    fh.setLevel(logging.DEBUG)
     ch.setLevel(logging.DEBUG)
 
     # create formatter and add it to the handlers
@@ -119,4 +116,4 @@ def register_logger(app):
 
     app.logger.addHandler(ch)
     app.logger.addHandler(fh)
-    app.logger.addHandler(gunicorn_logger)
+    app.logger.addHandler(app_logger)
