@@ -6,6 +6,7 @@ from datetime import datetime
 from flask_restplus import Resource
 from sqlalchemy.exc import OperationalError
 
+from foobar.config import get_config
 from foobar.service.extensions import api, migrate, sql_db
 
 app_name = 'foobar'
@@ -14,7 +15,7 @@ description = 'A flask API server template with Unit Tests, Swagger documentatio
               'ORMs, ORM Migrations, Docker and Kubernetes.'
 
 
-def create_app(config_object, enable_blueprints=True):
+def create_app(config_object=get_config(), enable_blueprints=True):
 
     app = Flask(app_name)
 
