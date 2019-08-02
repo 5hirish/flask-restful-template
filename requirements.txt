@@ -11,6 +11,7 @@ gunicorn==19.9.0
 flask_sqlalchemy==2.4.0
 flask_migrate==2.5.2
 flask-restplus==0.12.1
+#git+https://github.com/noirbizarre/flask-restplus
 
 # Python
 requests==2.20.0
