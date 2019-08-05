@@ -3,6 +3,9 @@ from foobar.service.core import create_app
 from foobar.config import get_config
 
 
+app_config = get_config()
+foobar_app = create_app(app_config)
+
 if __name__ == '__main__':
 
     if str(os.environ.get('FLASK_ENV')) != 'prod':
