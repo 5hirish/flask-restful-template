@@ -23,4 +23,4 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Run app when the container launches
-CMD python db.py; flask db upgrade; gunicorn --workers 3 --bind 0.0.0.0:8000 -m 007 run_server:foobar_app --log-level=info --log-file /foobar/logs/gunicorn.log
+CMD python init_db.py; flask db upgrade; gunicorn --workers 3 --bind 0.0.0.0:8000 -m 007 run_server:foobar_app --log-level=info --log-file /foobar/logs/gunicorn.log

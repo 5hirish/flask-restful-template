@@ -102,11 +102,10 @@ def register_logger(app):
     # create file handler which logs even debug messages
     os.makedirs(os.path.dirname(log_dir), exist_ok=True)
 
-    app_logger = logging.getLogger(app_name)
+    gunicorn_logger = logging.getLogger('gunicorn.error')
     fh = logging.FileHandler(os.path.join(log_dir, app_name + '.log'))
     ch = logging.StreamHandler()
 
-    app_logger.setLevel(logging.DEBUG)
     fh.setLevel(logging.DEBUG)
     ch.setLevel(logging.DEBUG)
 
@@ -117,4 +116,4 @@ def register_logger(app):
 
     app.logger.addHandler(ch)
     app.logger.addHandler(fh)
-    app.logger.addHandler(app_logger)
+    app.logger.addHandler(gunicorn_logger)
