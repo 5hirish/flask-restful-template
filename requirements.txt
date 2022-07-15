@@ -27,4 +27,4 @@ sqlalchemy==1.3.4
 pytest==3.9.1
 pytest-cov==2.5.0
 pytest-flask==0.14.0
-codecov==2.0.15
+codecov==2.0.16
